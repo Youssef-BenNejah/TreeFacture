@@ -42,6 +42,11 @@ created: {
     type: String,
     required: true
    
+  },
+  adresse: {
+    type: String,
+    required: true
+   
   }
 });
 

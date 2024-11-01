@@ -27,6 +27,8 @@ import Flag from 'react-world-flags';
 
 const AddPersonModal = ({ isOpen, toggle, refreshPeople, userId }) => {
   const [prenom, setPrenom] = useState("");
+  const [adresse, setAdresse] = useState("");
+
   const [nom, setNom] = useState("");
   const [company, setCompany] = useState("");
   const [pays, setPays] = useState(null);
@@ -160,6 +162,7 @@ const AddPersonModal = ({ isOpen, toggle, refreshPeople, userId }) => {
       telephone,
       email,
       cin,
+      adresse,
       createdBy: userId
     };
 
@@ -201,6 +204,8 @@ const AddPersonModal = ({ isOpen, toggle, refreshPeople, userId }) => {
     setTelephone("");
     setEmail("");
     setCin("");
+    setAdresse("");
+
 
   };
 
@@ -376,6 +381,25 @@ const AddPersonModal = ({ isOpen, toggle, refreshPeople, userId }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Entrez l'adresse e-mail."
+                  required
+                  style={{ borderLeft: 0, borderRadius: '0 0.25rem 0.25rem 0', transition: 'border-color 0.2s' }}
+                  onFocus={(e) => e.target.style.borderColor = '#80bdff'}
+                  onBlur={(e) => e.target.style.borderColor = '#ced4da'}
+                />
+              </InputGroup>
+            </FormGroup>
+            <FormGroup>
+              <Label for="adresse">Adresse</Label>
+              <InputGroup>
+                <InputGroupText style={{ backgroundColor: '#fff', border: '1px solid #ced4da', borderRight: 0, borderRadius: '0.25rem 0 0 0.25rem' }}>
+                  <i className="ni ni-globe"></i>
+                </InputGroupText>
+                <Input
+                  type="adresse"
+                  id="adresse"
+                  value={adresse}
+                  onChange={(e) => setAdresse(e.target.value)}
+                  placeholder="Entrez l'adresse ."
                   required
                   style={{ borderLeft: 0, borderRadius: '0 0.25rem 0.25rem 0', transition: 'border-color 0.2s' }}
                   onFocus={(e) => e.target.style.borderColor = '#80bdff'}

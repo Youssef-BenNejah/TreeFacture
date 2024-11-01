@@ -2,7 +2,7 @@ const Person = require('../models/appmodel/Person');
 
 // Create a new person
 exports.createPerson = async (req, res) => {
-    const { prenom, nom, entreprise, pays, telephone, email,cin,createdBy} = req.body;
+    const { prenom, nom, entreprise, pays, telephone, email,cin,adresse,createdBy} = req.body;
 
     const newPerson = new Person({
         prenom,
@@ -12,6 +12,7 @@ exports.createPerson = async (req, res) => {
         telephone,
         email,
         cin,
+        adresse,
         createdBy
     });
 

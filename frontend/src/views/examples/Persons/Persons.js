@@ -215,6 +215,8 @@ const Persons = () => {
                       <th scope="col">Téléphone</th>
                       <th scope="col">Email</th>
                       <th scope="col">Cin</th>
+                      <th scope="col">Adresse</th>
+
                       <th scope="col"></th>
                     </tr>
                   </thead>
@@ -235,6 +237,8 @@ const Persons = () => {
                           <td>{person.telephone}</td>
                           <td>{person.email}</td>
                           <td>{person.cin}</td>
+                          <td>{person.adresse}</td>
+
 
                           <td>
                             <Dropdown isOpen={dropdownOpen === person._id} toggle={() => toggleDropdown(person._id)} >

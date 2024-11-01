@@ -123,7 +123,9 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
 
                 <Table>
                     <thead>
-                        <tr>
+                        <tr>                       
+                            <th>Réf</th>
+
                             <th>Produit</th>
                             <th>Description</th>
                             <th>Prix</th>
@@ -133,12 +135,15 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
                     </thead>
                     <tbody>
                         {invoice.items.map((item, index) => (
+                            
                             <tr key={index}>
+                                <td>{item.ref}</td>
+
                                 <td>{item.article}</td>
                                 <td>{item.description}</td>
-                                <td>${item.price}</td>
+                                <td>{item.price}</td>
                                 <td>{item.quantity}</td>
-                                <td>${item.total}</td>
+                                <td>{item.total}</td>
                             </tr>
                         ))}
                     </tbody>

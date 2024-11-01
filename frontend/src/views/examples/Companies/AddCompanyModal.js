@@ -39,6 +39,8 @@ const validatePhoneNumber = (number, countryCode) => {
 
 const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
   const [nom, setNom] = useState("");
+  const [adresse, setAdresse] = useState("");
+
   const [pays, setPays] = useState(null);
   const [telephone, setTelephone] = useState("");
   const [email, setEmail] = useState("");
@@ -114,6 +116,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
       createdBy: userId,
       mainContact,
       rib,
+      adresse,
       fisc
     };
 
@@ -137,6 +140,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
       setSiteweb("");
       setRib("");
       setFisc("");
+      setAdresse("")
 
 
       setMainContact(null);
@@ -304,6 +308,26 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
               />
             </InputGroup>
           </FormGroup>
+
+          <FormGroup>
+            <Label for="adresse">Adresse</Label>
+            <InputGroup>
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <FontAwesomeIcon icon={faGlobe} />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                type="text"
+                id="adresse"
+                value={adresse}
+                onChange={(e) => setAdresse(e.target.value)}
+                placeholder="Entrer matricul adresseal"
+                required
+              />
+            </InputGroup>
+          </FormGroup>
+
 
 
         </ModalBody>

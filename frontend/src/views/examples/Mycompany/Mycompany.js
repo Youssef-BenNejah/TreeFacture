@@ -63,6 +63,9 @@ const CompanyComponent = () => {
     const [country, setCountry] = useState(null);
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [matriculefisc, setMatriculefisc] = useState('');
+
+    
    
     const token = localStorage.getItem('token');
     const decodedToken = token ? decodeToken(token) : {};
@@ -87,6 +90,7 @@ const CompanyComponent = () => {
             const data = response.data;
             setCompany(data);
             setName(data.name);
+            setMatriculefisc(data.matriculefisc);
             setAddress(data.address);
             setState(data.state);
             setCountry(options.find(opt => opt.value === data.country));
@@ -126,6 +130,7 @@ const CompanyComponent = () => {
         try {
             const companyData = {
                 name,
+                matriculefisc,
                 address,
                 state,
                 country: country?.value,
@@ -222,6 +227,10 @@ const CompanyComponent = () => {
                                         <td>{company?.name}</td>
                                     </tr>
                                     <tr>
+                                        <td>Matricule fiscal:</td>
+                                        <td>{company?.matriculefisc}</td>
+                                    </tr>
+                                    <tr>
                                         <td>Addresse:</td>
                                         <td>{company?.address}</td>
                                     </tr>
@@ -279,6 +288,15 @@ const CompanyComponent = () => {
                                 id="name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="name">Matricule fiscal</Label>
+                            <Input
+                                type="text"
+                                id="matriculefisc"
+                                value={matriculefisc}
+                                onChange={(e) => setMatriculefisc(e.target.value)}
                             />
                         </FormGroup>
                         <FormGroup>

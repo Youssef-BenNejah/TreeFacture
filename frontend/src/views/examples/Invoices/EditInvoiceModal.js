@@ -23,7 +23,7 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
         status: 'Brouillon',
         date: new Date().toISOString().substring(0, 10),
         note: '',
-        items: [{ article: '', description: '', quantity: 1, price: 0, total: 0 }],
+        items: [{ ref:'',article: '', description: '', quantity: 1, price: 0, total: 0 }],
         paidAmount: 0,
         tax: invoiceData ? invoiceData.tax : {},
     });
@@ -132,7 +132,7 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
     };
 
     const addItem = () => {
-        setInvoice({ ...invoice, items: [...invoice.items, { article: '', description: '', quantity: 1, price: 0, total: 0 }] });
+        setInvoice({ ...invoice, items: [...invoice.items, { ref:'',article: '', description: '', quantity: 1, price: 0, total: 0 }] });
     };
 
     const removeItem = (index) => {
@@ -236,7 +236,9 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
             formData.append('type', invoice.type);
 
             // Append items to FormData
+            console.log(invoice.items)
             invoice.items.forEach((item, index) => {
+                formData.append(`items[${index}][ref]`, item.ref);
                 formData.append(`items[${index}][article]`, item.article);
                 formData.append(`items[${index}][description]`, item.description);
                 formData.append(`items[${index}][quantity]`, item.quantity);
@@ -350,6 +352,7 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
     const handleProductChange = (index, selectedOption) => {
         const newItems = [...invoice.items];
         newItems[index] = {
+            ref:selectedOption.ref,
             article: selectedOption.label, // Assuming you want the product name as the article
             description: selectedOption.description,
             quantity: 1, // Default quantity
@@ -367,7 +370,9 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
                 value: product._id,
                 label: product.name, // Adjust to the property you want to show
                 price: product.price, // Assuming price is a property
-                description: product.description // Assuming description is a property
+                description: product.description, // Assuming description is a property
+                ref: product.reference // Assuming description is a property
+
             })));
         } catch (error) {
             console.error("Error fetching products:", error);
@@ -416,7 +421,6 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
                                 value={selectedClient ? selectedClient : ' '} // Use client ID here
                                 onChange={handleClientChange}
                             >
-                                {console.log("newwww", selectedClient.label)}
 
                                 <option value="">
                                    {getClientName(selectedClient.value)}
@@ -548,7 +552,7 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
                                 </Input>
                             </FormGroup>
                         </Col>
-                        <Col md={3}>
+                        <Col md={1}>
                             <FormGroup>
                                 <Label for={`quantity-${index}`}>Quantité</Label>
                                 <Input
@@ -562,6 +566,19 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
                                         newItems[index].total = newItems[index].quantity * newItems[index].price;
                                         setInvoice({ ...invoice, items: newItems });
                                     }}
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col md={2}>
+                            <FormGroup>
+                                <Label for={`ref-${index}`}></Label>
+                                <Input
+                                    type="number"
+                                    name={`ref-${index}`}
+                                    id={`ref-${index}`}
+                                    value={item.ref}
+                                    readOnly
+                                    
                                 />
                             </FormGroup>
                         </Col>

@@ -5,6 +5,10 @@ const companySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  matriculefisc: {
+    type: String,
+    required: true,
+  },
   address: {
     type: String,
     required: true,

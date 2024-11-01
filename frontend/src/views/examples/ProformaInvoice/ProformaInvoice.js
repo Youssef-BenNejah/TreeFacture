@@ -113,6 +113,7 @@ const ProformaInvoice = () => {
             const sortedInvoices = filteredInvoices.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             setInvoices(sortedInvoices);
+            console.log(sortedInvoices)
             setTotalPaid(calculateTotalPaid(filtre));
             setTotalUnPaid(calculateTotalUnPaid(filtre));
 

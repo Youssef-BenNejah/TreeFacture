@@ -25,7 +25,8 @@ const personSchema = new mongoose.Schema({
     pays: String,
     telephone: String,
     email: String,
-    cin: String
+    cin: String,
+    adresse : String
 
 });
 

@@ -196,6 +196,14 @@ const Company = () => {
     setSelectedCompany(company);
     toggleDisplayModal();
   };
+  const breakAddress = (address) => {
+    // Return an empty array if address is undefined or null
+    if (!address) return null; // or return an empty string, or "No address provided"
+
+    // Split the address into chunks of 20 characters
+    const chunks = address.match(/.{1,20}/g);
+    return chunks ? chunks.map((chunk, index) => <span key={index}>{chunk}<br /></span>) : address;
+};
 
   return (
     <>
@@ -223,13 +231,15 @@ const Company = () => {
                 <thead className="thead-light">
                   <tr>
                     <th scope="col">Nom</th>
-                    <th scope="col">Contact principal</th>
+                    {/* <th scope="col">Contact principal</th> */}
                     <th scope="col">Pays</th>
                     <th scope="col">Téléphone</th>
                     <th scope="col">Email</th>
                     <th scope="col">Site WEb</th>
                     <th scope="col">RIB</th>
                     <th scope="col">Matricul <br/> fiscal</th>
+                    <th scope="col">Adresse</th>
+
 
 
                     <th scope="col"></th>
@@ -241,13 +251,15 @@ const Company = () => {
                     currentCompanies.map((company) => (
                       <tr key={company._id}>
                         <td>{company.nom}</td>
-                        <td>{getMainContact(company._id)}</td>
+                        {/* <td>{getMainContact(company._id)}</td> */}
                         <td>{countryOptions[company.pays] || company.pays}</td>
                         <td>{company.telephone}</td>
                         <td>{company.email}</td>
                         <td><a target="_blank" href={company.siteweb}>{company.siteweb}</a></td>
                         <td>{company.rib}</td>
                         <td>{company.fisc}</td>
+                        <td>{breakAddress(company.adresse)}</td>
+
 
                         <td>
                           <Dropdown isOpen={dropdownOpen === company._id} toggle={() => toggleDropdown(company._id)} >

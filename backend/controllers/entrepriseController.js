@@ -2,7 +2,7 @@ const Entreprise = require('../models/appmodel/Entreprise');
 
 // Create a new entreprise
 exports.createEntreprise = async (req, res) => {
-  const { nom, mainContact, pays, telephone, email, siteweb,rib,fisc,createdBy } = req.body;
+  const { nom, mainContact, pays, telephone, email, siteweb,rib,fisc,adresse,createdBy } = req.body;
 
   try {
     const newEntreprise = new Entreprise({
@@ -14,6 +14,7 @@ exports.createEntreprise = async (req, res) => {
       siteweb,
       rib,
       fisc,
+      adresse,
       createdBy
     });
 
@@ -62,12 +63,12 @@ exports.getEntrepriseById = async (req, res) => {
 // Update an entreprise by ID
 exports.updateEntreprise = async (req, res) => {
   const { id } = req.params;
-  const { nom, mainContact, pays, telephone, email, siteweb } = req.body;
+  const { nom, mainContact, pays, telephone, email, siteweb,rib,fisc,adresse } = req.body;
 
   try {
     const updatedEntreprise = await Entreprise.findByIdAndUpdate(
       id,
-      { nom, mainContact, pays, telephone, email, siteweb },
+      { nom, mainContact, pays, telephone, email, siteweb,rib,fisc,adresse },
       { new: true }
     );
 

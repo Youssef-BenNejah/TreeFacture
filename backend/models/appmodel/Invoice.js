@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 // Schema for individual items in the invoice
 const itemSchema = new mongoose.Schema({
+  ref: {
+    type: String,
+    required: false,
+  },
+ 
   article: {
     type: String,
     required: true,
@@ -30,6 +35,10 @@ const invoiceSchema = new mongoose.Schema({
     ref: 'Client',
     required: true,
     autopopulate: true,
+  },
+  timbre: {
+    type: Number,
+    required: false,
   },
   number: {
     type: Number,

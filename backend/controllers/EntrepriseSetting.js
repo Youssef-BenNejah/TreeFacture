@@ -2,7 +2,7 @@ const Company = require('../models/coreModel/EntrepriseSetting');
 
 // Create or Update a company based on the createdBy field
 exports.createOrUpdateCompany = async (req, res) => {
-  const { name, address, state, country, email, phone, website, taxNumber, vatNumber, registrationNumber, createdBy } = req.body;
+  const { name, matriculefisc,address, state, country, email, phone, website, taxNumber, vatNumber, registrationNumber, createdBy } = req.body;
 
   try {
     // Check if a company with this createdBy already exists
@@ -12,7 +12,7 @@ exports.createOrUpdateCompany = async (req, res) => {
       // If company exists, update it
       company = await Company.findOneAndUpdate(
         { createdBy },
-        { name, address, state, country, email, phone, website, taxNumber, vatNumber, registrationNumber },
+        { name,matriculefisc, address, state, country, email, phone, website, taxNumber, vatNumber, registrationNumber },
         { new: true } // Return the updated document
       );
 
@@ -21,6 +21,7 @@ exports.createOrUpdateCompany = async (req, res) => {
       // If company does not exist, create a new one
       const newCompany = new Company({
         name,
+        matriculefisc,
         address,
         state,
         country,
@@ -53,6 +54,7 @@ exports.getCompanyByCreatedBy = async (req, res) => {
             defaultSettings: {
               name: '',
               address: '',
+              matriculefisc:"00000000000000",
               state: 'new york',
               country: 'usa',
               email: 'exmple@exemple.com',
@@ -110,6 +112,7 @@ const fileFilter = (req, file, cb) => {
     const { createdBy } = req.params;
     const defaultData = {
         name: "treetronix",
+        matriculefisc:"00000000",
         address: "25, Your Company Address",
         state: "New York",
         country: "United State",

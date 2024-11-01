@@ -33,6 +33,8 @@ const decodeToken = (token) => {
 
 const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) => {
   const [nom, setNom] = useState("");
+  const [adresse, setAdresse] = useState("");
+
   const [pays, setPays] = useState(null);
   const [telephone, setTelephone] = useState("");
   const [email, setEmail] = useState("");
@@ -66,6 +68,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
       setSiteweb(company.siteweb);
       setRib(company.rib);
       setFisc(company.fisc);
+      setAdresse(company.adresse)
 
       setMainContact(company.mainContact);
     }
@@ -127,11 +130,13 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
       siteweb,
       mainContact,
       rib,
-      fisc
+      fisc,
+      adresse
     };
 
     try {
       await axios.put(`http://localhost:5000/api/entreprise/${company._id}`, updatedCompany);
+      console.log(updatedCompany)
       refreshCompany();
       toggle();
       toast.success('Entreprise mise à jour avec succès.', {
@@ -324,6 +329,24 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
           </FormGroup>
          
             
+          <FormGroup>
+            <Label for="adresse">Adresse</Label>
+            <InputGroup>
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <FontAwesomeIcon icon={faGlobe} />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                type="text"
+                id="adresse"
+                value={adresse}
+                onChange={(e) => setAdresse(e.target.value)}
+                placeholder="Entrer  adresse"
+                required
+              />
+            </InputGroup>
+          </FormGroup>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" type="submit">Enregistrer</Button>{' '}

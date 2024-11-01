@@ -27,6 +27,8 @@ import Flag from 'react-world-flags';
 
 const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompanies, userId }) => {
   const [prenom, setPrenom] = useState("");
+  const [adresse, setAdresse] = useState("");
+
   const [nom, setNom] = useState("");
   const [company, setCompany] = useState("");
   const [pays, setPays] = useState(null);
@@ -52,6 +54,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
       setTelephone(person.telephone);
       setEmail(person.email);
       setCin(person.cin)
+      setAdresse(person.adresse)
 
       setInitialEmail(person.email);
       setInitialPhone(person.telephone);
@@ -168,6 +171,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
       pays: pays?.label,
       telephone,
       email,
+      adresse,
       cin
     };
 
@@ -357,6 +361,24 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Entrer email"
+                  required
+                  style={{ borderLeft: 0, borderRadius: '0 0.25rem 0.25rem 0', transition: 'border-color 0.2s' }}
+                />
+              </InputGroup>
+              
+            </FormGroup>
+            <FormGroup>
+              <Label for="adresse">Adresse</Label>
+              <InputGroup>
+                <InputGroupText style={{ backgroundColor: '#fff', border: '1px solid #ced4da', borderRight: 0, borderRadius: '0.25rem 0 0 0.25rem' }}>
+                  <i className="ni ni-adresse-83"></i>
+                </InputGroupText>
+                <Input
+                  type="adresse"
+                  id="adresse"
+                  value={adresse}
+                  onChange={(e) => setAdresse(e.target.value)}
+                  placeholder="Entrer Adresse"
                   required
                   style={{ borderLeft: 0, borderRadius: '0 0.25rem 0.25rem 0', transition: 'border-color 0.2s' }}
                 />
