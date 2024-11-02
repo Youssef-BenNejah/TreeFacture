@@ -1151,7 +1151,6 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     console.error("Error generating PDF and sending email:", error); // Log error
     res
       .status(500)
-      .json({ message: "Error generating and sending PDF", error });
   }
 };
 
@@ -1226,7 +1225,6 @@ async function sendInvoiceByEmail(invoice, pdfPath, companyName, res) {
     // Respond to the API call
     return res
       .status(200)
-      .json({ message: "Invoice generated and sent via email successfully" });
   } catch (error) {
     console.error("Error sending email:", error);
 
@@ -1237,6 +1235,5 @@ async function sendInvoiceByEmail(invoice, pdfPath, companyName, res) {
 
     return res
       .status(500)
-      .json({ message: "Failed to send email", error: error.message });
   }
 }
