@@ -583,6 +583,20 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
                     </Row>
                 ))}
                 <Button color="primary" onClick={addItem}>Ajouter</Button>
+                <hr/>
+                <Row form>
+          <Col md={12}>
+            <FormGroup>
+              <Label for="invoiceImage">Upload Invoice Image</Label>
+              <Input
+                type="file"
+                id="invoiceImage"
+                onChange={(e) => setFactureImage(e.target.files[0])} // Store the selected file
+                accept="image/jpeg,image/png,image/jpg"
+              />
+            </FormGroup>
+          </Col>
+        </Row>
                 <Row form className="mt-3">
                     <Col md={6}>
                         <FormGroup>

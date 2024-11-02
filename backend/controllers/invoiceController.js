@@ -8,6 +8,10 @@ const archiver = require("archiver");
 const mongoose = require("mongoose");
 const { DiffieHellmanGroup } = require("crypto");
 const multer = require("multer");
+const { toWords } = require('number-to-words');
+
+
+
 // Setup storage and filename for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -525,6 +529,12 @@ exports.generateInvoicePDF = async (req, res) => {
           240, // Adjust y-position to place CIN below the name
           { align: "right" }
         );
+        doc.text(
+          `${invoice.client.entreprise.adresse}`,
+          200,
+          260, // Adjust y-position to place CIN below the name
+          { align: "right" }
+        );
       }
 
       // Add table headers
@@ -579,20 +589,12 @@ exports.generateInvoicePDF = async (req, res) => {
 
       doc.text("Total HT :", 350, yPosition, { align: "left" });
       doc.text(
-        ` ${(invoice.subtotal+invoice.timbre).toFixed(3)} ${invoice.currency.symbol}`,
+        ` ${(invoice.subtotal).toFixed(3)} ${invoice.currency.symbol}`,
         450,
         yPosition,
         { align: "right" }
       );
-      yPosition += 15;
-      doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
-      doc.text(
-        ` ${invoice.timbre.toFixed(3)} ${invoice.currency.symbol}`,
-        450,
-        yPosition,
-        { align: "right" }
-      );
-
+     
       // Tax
       yPosition += 15; // Adjust yPosition to move down for the next line
       doc.text(
@@ -607,6 +609,14 @@ exports.generateInvoicePDF = async (req, res) => {
         yPosition,
         { align: "right" }
       );
+      yPosition += 15;
+      doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
+      doc.text(
+        ` ${invoice.timbre.toFixed(3)} ${invoice.currency.symbol}`,
+        450,
+        yPosition,
+        { align: "right" }
+      );
 
       // Total
       yPosition += 15; // Adjust yPosition to move down for the next line
@@ -617,6 +627,8 @@ exports.generateInvoicePDF = async (req, res) => {
         yPosition,
         { align: "right" }
       );
+      yPosition += 15;
+    
 
       // Add footer
       
@@ -764,19 +776,12 @@ yPosition += 10; // Add some spacing before the line
 
       doc.text("Total HT :", 350, yPosition, { align: "left" });
       doc.text(
-        ` ${(invoice.subtotal+invoice.timbre).toFixed(3)} ${invoice.currency.symbol}`,
+        ` ${invoice.subtotal.toFixed(3)} ${invoice.currency.symbol}`,
         450,
         yPosition,
         { align: "right" }
       );
-      yPosition += 15;
-      doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
-     doc.text(
-  ` ${invoice.timbre ? invoice.timbre.toFixed(3) : '0.000'} ${invoice.currency.symbol}`,
-  450,
-  yPosition,
-  { align: "right" }
-);
+    
 
     yPosition += 15;
     doc.text(
@@ -793,9 +798,18 @@ yPosition += 10; // Add some spacing before the line
     );
 
     yPosition += 15;
+    doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
+   doc.text(
+` ${invoice.timbre ? invoice.timbre.toFixed(3) : '0.000'} ${invoice.currency.symbol}`,
+450,
+yPosition,
+{ align: "right" }
+);
+yPosition += 15;
+
     doc.text("Total TTC :", 350, yPosition, { align: "left" });
     doc.text(
-      ` ${invoice.total.toFixed(3)} ${invoice.currency.symbol}`,
+      ` ${(invoice.total).toFixed(3)} ${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }
@@ -952,20 +966,38 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(fs.createWriteStream(pdfPath));
 
-    // // Add the company logo
-    // if (company.logo !== null) {
-    //   doc.image(company.logo, 50, 45, { width: 100 });
-    // } else {
-    //   doc.text('Logo Placeholder', 50, 45, { width: 100 });
-    // }
+    // Add the company logo
+    if (company.logo !== null) {
+      doc.image(company.logo, 20, 30, { width: 60 });
+    } else {
+      doc.text('Logo Placeholder', 50, 45, { width: 100 });
+    }
+    doc.pipe(res);
+
+    const companyName = company.name.toUpperCase();
+    const maxWidth = 200; // Adjust this width to prevent overlap
+    const xPosition = 160;
+    let zPosition = 30;
+
+    if (doc.widthOfString(companyName) > maxWidth) {
+      doc
+        .fontSize(20)
+        .text(companyName, xPosition, zPosition, {
+          width: maxWidth,
+          ellipsis: true,
+        })
+        .moveDown();
+      zPosition += 30; // Adjust spacing if needed
+    } else {
+      doc.fontSize(20).text(companyName, xPosition, zPosition).moveDown();
+    }
 
     // Add company information
-    doc.fontSize(20).text(company.name.toUpperCase(), 160, 30).moveDown();
     doc
       .fontSize(10)
-      .text(company.address, 200, 30, { align: "right" })
-      .text(company.state, 200, 50, { align: "right" })
-      .text(company.country, 200, 70, { align: "right" });
+      .text(company.address, 400, 30, { align: "right" })
+      .text(company.phone, 400, 50, { align: "right" })
+      .text(company.matriculefisc, 400, 70, { align: "right" });
 
     // Add invoice title
     doc.fontSize(20).fillColor("#5F259F").text("Facture", 50, 160);
@@ -978,31 +1010,55 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
       .moveDown();
 
-    doc.text(`Client type : ${invoice.client.type}`, 200, 200, {
-      align: "right",
-    });
-    if (invoice.client.person != null) {
-      doc.text(
-        `Client Name : ${invoice.client.person.nom} ${invoice.client.person.prenom}`,
-        200,
-        220,
-        { align: "right" }
-      );
-    } else if (invoice.client.entreprise != null) {
-      doc.text(`Client Name : ${invoice.client.entreprise.nom}`, 200, 220, {
-        align: "right",
-      });
-    }
-
+    
+      if (invoice.client.person != null) {
+        doc.text(
+          ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
+          200,
+          220,
+          { align: "right" }
+        );
+        doc.text(
+          `${invoice.client.person.cin}`,
+          200,
+          240, // Adjust y-position to place CIN below the name
+          { align: "right" }
+        );
+        doc.text(
+          `${invoice.client.person.adresse}`,
+          200,
+          260, // Adjust y-position to place CIN below the name
+          { align: "right" }
+        );
+      }
+      if (invoice.client.entreprise != null) {
+        doc.text(` ${invoice.client.entreprise.nom}`, 200, 220, {
+          align: "right",
+        });
+        doc.text(
+          `${invoice.client.entreprise.fisc}`,
+          200,
+          240, // Adjust y-position to place CIN below the name
+          { align: "right" }
+        );
+        doc.text(
+          `${invoice.client.entreprise.adresse}`,
+          200,
+          260, // Adjust y-position to place CIN below the name
+          { align: "right" }
+        );
+      }
     // Add table headers
     doc
       .moveDown()
       .fillColor("#5F259F")
       .fontSize(12)
-      .text("Article", 50, 270)
-      .text("Quantité", 200, 270, { align: "center" })
+      .text("Référence", 50, 270)
+
+      .text("Article", 120, 270)
+      .text("Quantité", 140, 270, { align: "center" })
       .text("Prix", 300, 270, { align: "center" })
-      .text("Total", 400, 270, { align: "center" })
+      .text("Total", 450, 270, { align: "center" })
       .moveTo(50, 285)
       .lineTo(550, 285)
       .stroke();
@@ -1013,16 +1069,18 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       doc
         .fillColor("black")
         .fontSize(10)
-        .text(item.article, 50, yPosition)
-        .text(item.quantity, 200, yPosition, { align: "center" })
+        .text(item.ref, 50, yPosition)
+
+        .text(item.article, 120, yPosition)
+        .text(item.quantity, 140, yPosition, { align: "center" })
         .text(
-          `${invoice.currency.symbol} ${item.price.toFixed(3)}`,
+          ` ${item.price.toFixed(3)}${invoice.currency.symbol}`,
           300,
           yPosition,
           { align: "center" }
         )
         .text(
-          `${invoice.currency.symbol} ${item.total.toFixed(3)}`,
+          ` ${item.total.toFixed(3)}${invoice.currency.symbol}`,
           400,
           yPosition,
           { align: "center" }
@@ -1033,11 +1091,15 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
 
     // Add subtotal, tax, and total
     doc.fontSize(10).fillColor("black");
+    yPosition += 10; // Add some spacing before the line
+    doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke(); // Draw the line
+
+    yPosition += 10; // Add some spacing after the line
 
     // Subtotal
-    doc.text("Sous-total :", 350, yPosition, { align: "left" });
+    doc.text("Total HT :", 350, yPosition, { align: "left" });
     doc.text(
-      `${invoice.currency.symbol} ${invoice.subtotal.toFixed(3)}`,
+      ` ${invoice.subtotal.toFixed(3)}${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }
@@ -1046,23 +1108,30 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     // Tax
     yPosition += 15; // Adjust yPosition to move down for the next line
     doc.text(
-      `Tax ${invoice.tax.name} (${invoice.tax.value}%) :`,
+      `Tax ${invoice.tax.name} (${invoice.tax.taxvalue}%) :`,
       350,
       yPosition,
       { align: "left" }
     );
     doc.text(
-      `${invoice.currency.symbol} ${invoice.taxAmount.toFixed(3)}`,
+      ` ${invoice.taxAmount.toFixed(3)}${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }
     );
-
+    yPosition += 15;
+    doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
+    doc.text(
+      ` ${invoice.timbre.toFixed(3)} ${invoice.currency.symbol}`,
+      450,
+      yPosition,
+      { align: "right" }
+    );
     // Total
     yPosition += 15; // Adjust yPosition to move down for the next line
-    doc.text("Total :", 350, yPosition, { align: "left" });
+    doc.text("Total TTC :", 350, yPosition, { align: "left" });
     doc.text(
-      `${invoice.currency.symbol} ${invoice.total.toFixed(3)}`,
+      ` ${invoice.total.toFixed(3)}${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }

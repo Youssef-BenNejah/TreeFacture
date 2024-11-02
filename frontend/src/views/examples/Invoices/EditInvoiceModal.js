@@ -26,6 +26,8 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
         items: [{ ref:'',article: '', description: '', quantity: 1, price: 0, total: 0 }],
         paidAmount: 0,
         tax: invoiceData ? invoiceData.tax : {},
+        timbre:0,
+        
     });
 
 
@@ -273,7 +275,7 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
 
             // Append tax amount and total
             formData.append('taxAmount', taxAmount); // Ensure this value is calculated correctly
-            formData.append('total', invoiceTotal);
+            formData.append('total', invoiceTotal+parseFloat(invoice.timbre || 0));
             formData.append('createdBy', userId);
 
             // Append the image file if it exists
@@ -288,6 +290,7 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
 
             // Determine payment status
             let paymentStatus = invoice.paidAmount >= invoice.total ? 'Payé' : 'impayé';
+            formData.append('timbre', invoice.timbre);
 
             // Send the invoice data
             await axios.put(`http://localhost:5000/api/invoices/invoices/${invoice._id}`, formData, {
@@ -619,6 +622,22 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
                                         {tax.label}
                                     </option>
                                 ))}
+                            </Input>
+
+                        </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                        <FormGroup>
+                            <Label for="timbre">Timbre fiscal</Label>
+                            <Input
+                                type="number"
+                                name="timbre"
+                                id="timbre"
+                                value={invoice.timbre}
+                                onChange={handleInputChange} // Ensure selectedTax is correctly set
+
+                            >                               
+
                             </Input>
 
                         </FormGroup>

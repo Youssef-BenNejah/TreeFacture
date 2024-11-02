@@ -153,6 +153,8 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
                     <p>Sous-total: {invoice.subtotal}</p>
                     <p>Total des taxes : {invoice.taxAmount}</p>
                     <p><strong>Total:</strong> {invoice.total}</p>
+                    <p><strong>Timber:</strong> {invoice.timbre}</p>
+
                 </div>
 
                 <div className="action-buttons">
