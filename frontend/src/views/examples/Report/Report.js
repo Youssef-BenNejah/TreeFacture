@@ -261,7 +261,7 @@ const Report = () => {
 
     const getCurrencySymbolById = (id, price) => {
         const currency = currencies.find(c => c._id === id);
-        return currency ? `${price.toFixed(2)} ${currency.symbol}` : price.toFixed(2);
+        return currency ? `${price.toFixed(3)} ${currency.symbol}` : price.toFixed(3);
     };
 
     const toggleDropdown = (dropdown) => {

@@ -423,9 +423,9 @@ const Index = () => {
     }
 
     const currency = currencies.find(c => c._id === id);
-    if (!currency) return numericPrice.toFixed(2);
+    if (!currency) return numericPrice.toFixed(3);
 
-    return `${currency.symbol} ${numericPrice.toFixed(2)}`;
+    return `${currency.symbol} ${numericPrice.toFixed(3)}`;
   };
 
   const toggleCurrencyDropdown = () => setCurrencyDropdownOpen(!currencyDropdownOpen);
@@ -617,8 +617,7 @@ const Index = () => {
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-warning text-white rounded-circle shadow">
-                          <i className="fas fa-file-invoice" />
-                        </div>
+                        <i className="fa fa-chart-line"></i>                       </div>
                       </Col>
                     </Row>
                   </CardBody>

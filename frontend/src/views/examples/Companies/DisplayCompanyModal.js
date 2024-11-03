@@ -56,6 +56,18 @@ const DisplayCompanyModal = ({ isOpen, toggle, company, people }) => {
               <th><span style={thStyle}>Email</span></th>
               <td>{company.email}</td>
             </tr>
+            <tr>
+              <th><span style={thStyle}>RIB</span></th>
+              <td>{company.rib}</td>
+            </tr>
+            <tr>
+              <th><span style={thStyle}>Matricul fiscal</span></th>
+              <td>{company.fisc}</td>
+            </tr>
+            <tr>
+              <th><span style={thStyle}>Adresse</span></th>
+              <td>{company.adresse}</td>
+            </tr>
           </tbody>
         </Table>
       </ModalBody>

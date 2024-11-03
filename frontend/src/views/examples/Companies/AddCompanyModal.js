@@ -267,7 +267,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>
-                  <FontAwesomeIcon icon={faGlobe} />
+                <i className="fa fa-file-alt"></i>
                 </InputGroupText>
               </InputGroupAddon>
               <Input
@@ -295,7 +295,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>
-                  <FontAwesomeIcon icon={faGlobe} />
+                <i className="fa fa-id-card"></i>
                 </InputGroupText>
               </InputGroupAddon>
               <Input
@@ -314,7 +314,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>
-                  <FontAwesomeIcon icon={faGlobe} />
+                <i className="ni ni-pin-3"></i>                  
                 </InputGroupText>
               </InputGroupAddon>
               <Input
@@ -322,7 +322,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
                 id="adresse"
                 value={adresse}
                 onChange={(e) => setAdresse(e.target.value)}
-                placeholder="Entrer matricul adresseal"
+                placeholder="Entrer  adresse"
                 required
               />
             </InputGroup>

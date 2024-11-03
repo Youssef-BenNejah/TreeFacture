@@ -23,9 +23,11 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
         status: 'Brouillon',
         date: new Date().toISOString().substring(0, 10),
         note: '',
-        items: [{ article: '', description: '', quantity: 1, price: 0, total: 0 }],
+        items: [{ ref:'',article: '', description: '', quantity: 1, price: 0, total: 0 }],
         paidAmount: 0,
         tax: invoiceData ? invoiceData.tax : {},
+        timbre:0,
+
     });
 
 
@@ -132,7 +134,7 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
     };
 
     const addItem = () => {
-        setInvoice({ ...invoice, items: [...invoice.items, { article: '', description: '', quantity: 1, price: 0, total: 0 }] });
+        setInvoice({ ...invoice, items: [...invoice.items, { ref:'',article: '', description: '', quantity: 1, price: 0, total: 0 }] });
     };
 
     const removeItem = (index) => {
@@ -237,6 +239,8 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
 
             // Append items to FormData
             invoice.items.forEach((item, index) => {
+                formData.append(`items[${index}][ref]`, item.ref);
+
                 formData.append(`items[${index}][article]`, item.article);
                 formData.append(`items[${index}][description]`, item.description);
                 formData.append(`items[${index}][quantity]`, item.quantity);
@@ -271,7 +275,7 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
 
             // Append tax amount and total
             formData.append('taxAmount', taxAmount); // Ensure this value is calculated correctly
-            formData.append('total', invoiceTotal);
+            formData.append('total', invoiceTotal+parseFloat(invoice.timbre || 0));
             formData.append('createdBy', userId);
 
             // Append the image file if it exists
@@ -286,6 +290,7 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
 
             // Determine payment status
             let paymentStatus = invoice.paidAmount >= invoice.total ? 'Payé' : 'impayé';
+            formData.append('timbre', invoice.timbre);
 
             // Send the invoice data
             await axios.put(`http://localhost:5000/api/invoices/invoices/${invoice._id}`, formData, {
@@ -350,6 +355,8 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
     const handleProductChange = (index, selectedOption) => {
         const newItems = [...invoice.items];
         newItems[index] = {
+            ref:selectedOption.ref,
+
             article: selectedOption.label, // Assuming you want the product name as the article
             description: selectedOption.description,
             quantity: 1, // Default quantity
@@ -367,7 +374,9 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
                 value: product._id,
                 label: product.name, // Adjust to the property you want to show
                 price: product.price, // Assuming price is a property
-                description: product.description // Assuming description is a property
+                description: product.description,
+                ref: product.reference // Assuming description is a property
+                // Assuming description is a property
             })));
         } catch (error) {
             console.error("Error fetching products:", error);
@@ -548,7 +557,7 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
                                 </Input>
                             </FormGroup>
                         </Col>
-                        <Col md={3}>
+                        <Col md={1}>
                             <FormGroup>
                                 <Label for={`quantity-${index}`}>Quantité</Label>
                                 <Input
@@ -562,6 +571,19 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
                                         newItems[index].total = newItems[index].quantity * newItems[index].price;
                                         setInvoice({ ...invoice, items: newItems });
                                     }}
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col md={2}>
+                            <FormGroup>
+                                <Label for={`ref-${index}`}></Label>
+                                <Input
+                                    type="number"
+                                    name={`ref-${index}`}
+                                    id={`ref-${index}`}
+                                    value={item.ref}
+                                    readOnly
+                                    
                                 />
                             </FormGroup>
                         </Col>
@@ -620,12 +642,30 @@ const EditProformaInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices
 
                         </FormGroup>
                     </Col>
+                    <Col md={6}>
+                        <FormGroup>
+                            <Label for="timbre">Timbre fiscal</Label>
+                            <Input
+                                type="number"
+                                name="timbre"
+                                id="timbre"
+                                value={invoice.timbre}
+                                onChange={handleInputChange} // Ensure selectedTax is correctly set
+
+                            >                               
+
+                            </Input>
+
+                        </FormGroup>
+                    </Col>
                 </Row>
                 <Row>
                     <Col md={6}>
-                        <div>Subtotal: {calculateSubtotal().toFixed(2)}</div>
-                        <div>Tax:{taxAmount.toFixed(2)}</div>
-                        <div>Total: {invoiceTotal.toFixed(2)}</div>
+                        <div>Total HT: {calculateSubtotal().toFixed(3)}</div>
+                        <div>Tax:{taxAmount.toFixed(3)}</div>
+                        <div>Timbre fiscal:{invoice.timbre.toFixed(3)}</div>
+
+                        <div>Total TTC: {(invoiceTotal+parseFloat(invoice.timbre || 0)).toFixed(3)}</div>
                     </Col>
                 </Row>
 

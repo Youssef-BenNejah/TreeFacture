@@ -150,10 +150,10 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
                 </Table>
 
                 <div className="totals-section">
-                    <p>Sous-total: {invoice.subtotal}</p>
-                    <p>Total des taxes : {invoice.taxAmount}</p>
-                    <p><strong>Total:</strong> {invoice.total}</p>
-                    <p><strong>Timber:</strong> {invoice.timbre}</p>
+                    <p>Total HT: {invoice.subtotal}</p>
+                    <p>Tax : {invoice.taxAmount}</p>
+                    <p>Timbre fiscal:{invoice.timbre}</p>
+                    <p><strong>Total TTC:</strong> {invoice.total}</p>
 
                 </div>
 

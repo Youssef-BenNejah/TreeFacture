@@ -179,7 +179,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
 
   return (
     <Modal isOpen={isOpen} toggle={toggle} fade={true} className="custom-modal">
-      <ModalHeader toggle={toggle}>Modifer Company</ModalHeader>
+      <ModalHeader toggle={toggle}>Modifer entreprise</ModalHeader>
       <Form onSubmit={handleSubmit}>
         <ModalBody>
           <FormGroup>
@@ -286,7 +286,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>
-                  <FontAwesomeIcon icon={faGlobe} />
+                <i className="fa fa-file-alt"></i>
                 </InputGroupText>
               </InputGroupAddon>
               <Input
@@ -314,7 +314,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>
-                  <FontAwesomeIcon icon={faGlobe} />
+                <i className="fa fa-id-card"></i>
                 </InputGroupText>
               </InputGroupAddon>
               <Input
@@ -334,7 +334,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>
-                  <FontAwesomeIcon icon={faGlobe} />
+                <i className="ni ni-pin-3"></i>                  
                 </InputGroupText>
               </InputGroupAddon>
               <Input

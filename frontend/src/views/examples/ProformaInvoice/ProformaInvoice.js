@@ -494,7 +494,6 @@ const ProformaInvoice = () => {
                                             <th scope="col">Total</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">paiement</th>
-                                            <th scope="col">Timber</th>
 
 
 
@@ -537,9 +536,7 @@ const ProformaInvoice = () => {
                                                             {invoice.paymentStatus}
                                                         </Badge>
                                                     </td>
-                                                    <td>
-                                                        {invoice.timbre}
-                                                    </td>
+                                                   
                                                     <td>
                                                         <Dropdown isOpen={dropdownOpen === invoice._id} toggle={() => toggleDropdown(invoice._id)} >
                                                             <DropdownToggle tag="span" data-toggle="dropdown" style={{ cursor: 'pointer' }}>

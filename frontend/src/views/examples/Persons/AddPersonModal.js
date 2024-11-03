@@ -280,7 +280,7 @@ const AddPersonModal = ({ isOpen, toggle, refreshPeople, userId }) => {
               <Label for="cin">CIN</Label>
               <InputGroup>
                 <InputGroupText style={{ backgroundColor: '#fff', border: '1px solid #ced4da', borderRight: 0, borderRadius: '0.25rem 0 0 0.25rem' }}>
-                  <i className="ni ni-single-02"></i>
+                <i className="ni ni-credit-card"></i>
                 </InputGroupText>
                 <Input
                   type="text"
@@ -392,8 +392,7 @@ const AddPersonModal = ({ isOpen, toggle, refreshPeople, userId }) => {
               <Label for="adresse">Adresse</Label>
               <InputGroup>
                 <InputGroupText style={{ backgroundColor: '#fff', border: '1px solid #ced4da', borderRight: 0, borderRadius: '0.25rem 0 0 0.25rem' }}>
-                  <i className="ni ni-globe"></i>
-                </InputGroupText>
+                <i className="ni ni-pin-3"></i>                </InputGroupText>
                 <Input
                   type="adresse"
                   id="adresse"

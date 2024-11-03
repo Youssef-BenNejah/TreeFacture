@@ -58,6 +58,14 @@ const DisplayPersonModal = ({ isOpen, toggle, person, companies }) => {
               <th ><span style={thStyle}>Email</span></th>
               <td>{person.email}</td>
             </tr>
+            <tr>
+              <th ><span style={thStyle}>CIN</span></th>
+              <td>{person.cin}</td>
+            </tr>
+            <tr>
+              <th ><span style={thStyle}>Adresse</span></th>
+              <td>{person.adresse}</td>
+            </tr>
           </tbody>
         </Table>
       </ModalBody>

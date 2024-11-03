@@ -8,10 +8,76 @@ const archiver = require("archiver");
 const mongoose = require("mongoose");
 const { DiffieHellmanGroup } = require("crypto");
 const multer = require("multer");
-const { toWords } = require('number-to-words');
+const num2words = require('num2words');
+const numberToWords = require('number-to-words');
 
+function convertToFrenchText(number) {
+  const units = [
+      "", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"
+  ];
+  const teens = [
+      "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize"
+  ];
+  const tens = [
+      "", "", "vingt", "trente", "quarante", "cinquante", "soixante",
+      "soixante-dix", "quatre-vingts", "quatre-vingt-dix"
+  ];
+  const thousands = ["", "mille", "millions", "milliards"];
 
+  if (number < 10) return units[number];
+  if (number < 20) return teens[number - 10];
+  if (number < 100) {
+      const tenPart = Math.floor(number / 10);
+      const unitPart = number % 10;
+      return (tens[tenPart] + (unitPart > 0 ? " " + units[unitPart] : "")).trim();
+  }
+  if (number < 1000) {
+      const hundredPart = Math.floor(number / 100);
+      const rest = number % 100;
+      return (hundredPart > 1 ? units[hundredPart] + " cents " : " cent ") + (rest > 0 ? " " + convertToFrenchText(rest) : "").trim();
+  }
 
+  let result = "";
+  let thousandIndex = 0;
+
+  while (number > 0) {
+      const part = number % 1000;
+      if (part > 0) {
+          const prefix = convertToFrenchText(part).trim();
+          const thousandPart = thousands[thousandIndex];
+          result = prefix + (thousandPart ? " " + thousandPart : "") + (result ? " " + result : "");
+      }
+      number = Math.floor(number / 1000);
+      thousandIndex++;
+  }
+
+  return result.trim();
+}
+
+function convertDecimalToFrenchText(decimal) {
+  const decimalNumber = parseInt(decimal);
+  if (decimalNumber === 0) return ""; // Si la partie décimale est 0, ne rien afficher.
+
+  return convertToFrenchText(decimalNumber); // Conversion de la partie décimale
+}
+
+function convertNumberToFrenchText(number, curr) {
+  const parts = number.toString().split('.');
+  const integerPart = parseInt(parts[0]);
+  const decimalPart = parts[1] ? parts[1].padEnd(3, '0') : '000'; // Remplir avec des zéros pour avoir toujours 3 chiffres
+
+  let text = convertToFrenchText(integerPart) + " " + curr; // Afficher la partie entière et la monnaie
+
+  // Conversion de la partie décimale
+  const decimalText = convertDecimalToFrenchText(decimalPart);
+
+  // Combiner les deux parties
+  if (decimalText) {
+      text += " et " + decimalText.trim(); // Ajouter la partie décimale
+  }
+
+  return text.trim();
+}
 // Setup storage and filename for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -627,7 +693,13 @@ exports.generateInvoicePDF = async (req, res) => {
         yPosition,
         { align: "right" }
       );
+      const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
+
       yPosition += 15;
+      doc.text(text, 350, yPosition, {
+          align: 'left',
+          width: 200, // Ajoutez cette propriété pour limiter la largeur
+      });
     
 
       // Add footer
@@ -814,7 +886,13 @@ yPosition += 15;
       yPosition,
       { align: "right" }
     );
+    const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
 
+    yPosition += 15;
+    doc.text(text, 350, yPosition, {
+        align: 'left',
+        width: 200, // Ajoutez cette propriété pour limiter la largeur
+    });
     // Add footer
     
 
@@ -1136,6 +1214,13 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       yPosition,
       { align: "right" }
     );
+    const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
+
+    yPosition += 15;
+    doc.text(text, 350, yPosition, {
+        align: 'left',
+        width: 200, // Ajoutez cette propriété pour limiter la largeur
+    });
 
     // Add footer
    

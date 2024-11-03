@@ -645,9 +645,11 @@ const EditInvoiceModal = ({ isOpen, toggle, invoiceData, refreshInvoices, userId
                 </Row>
                 <Row>
                     <Col md={6}>
-                        <div>Subtotal: {calculateSubtotal().toFixed(2)}</div>
-                        <div>Tax:{taxAmount.toFixed(2)}</div>
-                        <div>Total: {invoiceTotal.toFixed(2)}</div>
+                        <div>Total HT: {calculateSubtotal().toFixed(3)}</div>
+                        <div>Tax:{taxAmount.toFixed(3)}</div>
+                        <div>Timbre fiscal:{invoice.timbre.toFixed(3)}</div>
+
+                        <div>Total TTC: {(invoiceTotal+parseFloat(invoice.timbre || 0)).toFixed(3)}</div>
                     </Col>
                 </Row>
 

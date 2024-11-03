@@ -107,9 +107,9 @@ const Products = () => {
         const currency = currencies.find(currency => currency._id === id);
         if (!currency) return 'Devise non trouvée';
         if (currency.symbolPosition === "after") {
-            return price.toFixed(2) + currency.symbol;
+            return price.toFixed(3) + currency.symbol;
         } else if (currency.symbolPosition === "before") {
-            return currency.symbol + price.toFixed(2);
+            return currency.symbol + price.toFixed(3);
         } else {
             return currency.symbol;
         }

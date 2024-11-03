@@ -276,8 +276,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
               <Label for="cin">CIN</Label>
               <InputGroup>
                 <InputGroupText style={{ backgroundColor: '#fff', border: '1px solid #ced4da', borderRight: 0, borderRadius: '0.25rem 0 0 0.25rem' }}>
-                  <i className="ni ni-single-02"></i>
-                </InputGroupText>
+                <i className="ni ni-credit-card"></i>                </InputGroupText>
                 <Input
                   type="text"
                   id="cin"
@@ -371,8 +370,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
               <Label for="adresse">Adresse</Label>
               <InputGroup>
                 <InputGroupText style={{ backgroundColor: '#fff', border: '1px solid #ced4da', borderRight: 0, borderRadius: '0.25rem 0 0 0.25rem' }}>
-                  <i className="ni ni-adresse-83"></i>
-                </InputGroupText>
+                <i className="ni ni-pin-3"></i>                </InputGroupText>
                 <Input
                   type="adresse"
                   id="adresse"
