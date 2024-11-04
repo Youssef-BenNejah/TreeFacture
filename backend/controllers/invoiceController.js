@@ -580,7 +580,12 @@ exports.generateInvoicePDF = async (req, res) => {
         .text(`Date : ${invoice.date.toLocaleDateString()}`, 50, 200)
         .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
         .moveDown();
-
+        doc.text(
+          ` Client :`,
+          200,
+          200,
+          { align: "right" }
+        );
       if (invoice.client.person != null) {
         doc.text(
           ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
@@ -712,9 +717,9 @@ exports.generateInvoicePDF = async (req, res) => {
       const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
 
       yPosition += 15;
-      doc.text(text, 350, yPosition, {
+      doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {
           align: 'left',
-          width: 200, // Ajoutez cette propriété pour limiter la largeur
+          width: 800, // Ajoutez cette propriété pour limiter la largeur
       });
     
 
@@ -779,6 +784,12 @@ const generatePDF = (invoice, company) => {
       .moveDown();
 
     // Add client information
+    doc.text(
+      ` Client :`,
+      200,
+      200,
+      { align: "right" }
+    );
     if (invoice.client.person != null) {
       doc.text(
         ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
@@ -905,10 +916,11 @@ yPosition += 15;
     const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
 
     yPosition += 15;
-    doc.text(text, 350, yPosition, {
-        align: 'left',
-        width: 200, // Ajoutez cette propriété pour limiter la largeur
-    });
+    doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {
+      align: 'left',
+      width: 800, // Ajoutez cette propriété pour limiter la largeur
+  });
+
     // Add footer
     
 
@@ -1104,7 +1116,12 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
       .moveDown();
 
-    
+      doc.text(
+        ` Client :`,
+        200,
+        200,
+        { align: "right" }
+      );
       if (invoice.client.person != null) {
         doc.text(
           ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
@@ -1233,10 +1250,11 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
 
     yPosition += 15;
-    doc.text(text, 350, yPosition, {
-        align: 'left',
-        width: 200, // Ajoutez cette propriété pour limiter la largeur
-    });
+    doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {
+      align: 'left',
+      width: 800, // Ajoutez cette propriété pour limiter la largeur
+  });
+
 
     // Add footer
    

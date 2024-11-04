@@ -39,15 +39,25 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
         console.log('Downloading PDF for invoice:', invoice);
     
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/export-pdf/${invoice._id}/${invoice.createdBy}`, {
-                responseType: 'blob', 
-            });
+            const response = await axios.get(
+                `${process.env.REACT_APP_API_URL}/api/invoices/export-pdf/${invoice._id}/${invoice.createdBy}`,
+                { responseType: 'blob' }
+            );
     
             if (response.status === 200) {
+                // Determine custom file name based on client details
+                let customFileName = `facture-${invoice.number}.pdf`;
+                
+                if (invoice.client.person != null) {
+                    customFileName = `facture-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
+                } else if (invoice.client.entreprise != null) {
+                    customFileName = `facture-${invoice.client.entreprise.nom}-${invoice.number}.pdf`;
+                }
+    
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', `invoice-${invoice.number}.pdf`);
+                link.setAttribute('download', customFileName);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
