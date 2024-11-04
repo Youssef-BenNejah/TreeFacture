@@ -435,13 +435,16 @@ exports.generateInvoicePDF = async (req, res) => {
       const imagePath = path.join(__dirname, "../", invoice.factureImage);
 
       // Set the custom file name for the download
-      let customFileName = `invoice-${invoice.number}.pdf`;
+     // let customFileName = `invoice-${invoice.number}.pdf`;
 
       if (invoice.client.person != null) {
-        customFileName = `invoice-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
+        console.log()
+        customFileName = `facture-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
+        console.log(customFileName)
       } else if (invoice.client.entreprise != null) {
-        customFileName = `invoice-${invoice.client.entreprise.nom}-${invoice.number}.pdf`;
+        customFileName = `facture-${invoice.client.entreprise.nom}-${invoice.number}.pdf`;
       }
+      console.log(customFileName)
       // Add the company logo
 
       // Check if the factureImage file exists
@@ -514,10 +517,12 @@ exports.generateInvoicePDF = async (req, res) => {
       const doc = new PDFDocument({ margin: 50 });
 
       // Set the response to download the PDF
+      /*
       res.setHeader(
         "Content-disposition",
         `attachment; filename=invoice-${invoice.number}.pdf`
       );
+      */
       res.setHeader("Content-type", "application/pdf");
 
       if (invoice.client.person != null) {
@@ -978,9 +983,9 @@ exports.generateMultipleInvoicesZip = async (req, res) => {
 
     // Create a zip archive
     const archive = archiver("zip", { zlib: { level: 9 } });
-
+    
     // Set the response headers for the zip file
-    res.setHeader("Content-Disposition", "attachment; filename=invoices.zip");
+    res.setHeader("Content-Disposition", "attachment; filename=factures.zip");
     res.setHeader("Content-Type", "application/zip");
 
     // Pipe the archive into the response
@@ -1008,7 +1013,7 @@ exports.generateMultipleInvoicesZip = async (req, res) => {
       }
 
       // Set the file name dynamically based on the client's information
-      let filename = `invoice-${invoice.number}.pdf`;
+      //let filename = `invoice-${invoice.number}.pdf`;
       if (invoice.client.person) {
         filename = `invoice-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
       } else if (invoice.client.entreprise) {
@@ -1047,7 +1052,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     }
 
     // Define the file path where the PDF will be temporarily saved
-    let pdfFileName = `invoice-${invoice.number}.pdf`;
+   // let pdfFileName = `invoice-${invoice.number}.pdf`;
     if (invoice.client.person != null) {
       pdfFileName = `invoice-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
     } else if (invoice.client.entreprise != null) {
