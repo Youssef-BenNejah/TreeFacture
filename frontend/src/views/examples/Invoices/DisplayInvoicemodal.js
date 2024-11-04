@@ -71,6 +71,7 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
         }
     };
     
+    
 
     const handleSendEmail = async () => {
         setLoading(true); 

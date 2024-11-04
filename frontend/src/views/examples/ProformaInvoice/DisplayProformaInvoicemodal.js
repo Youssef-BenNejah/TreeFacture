@@ -64,6 +64,7 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
             toast.error('Error downloading PDF. Please try again.');
         }
     };
+    
 
     const handleSendEmail = async () => {
         setLoading(true);
