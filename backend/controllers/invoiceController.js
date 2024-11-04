@@ -628,7 +628,7 @@ exports.generateInvoicePDF = async (req, res) => {
         .text("Référence", 50, 290)
         .text("Article", 120, 290)
         .text("Quantité", 140, 290, { align: "center" })
-        .text("Prix", 300, 290, { align: "center" })
+        .text("Prix unt", 300, 290, { align: "center" })
         .text("Total", 450, 290, { align: "center" })
         .moveTo(50, 305)
         .lineTo(550, 305)
@@ -644,13 +644,13 @@ exports.generateInvoicePDF = async (req, res) => {
           .text(item.article, 120, yPosition)
           .text(item.quantity, 140, yPosition, { align: "center" })
           .text(
-            ` ${item.price.toFixed(3)} ${invoice.currency.symbol}`,
+            ` ${item.price.toFixed(3)} `,
             300,
             yPosition,
             { align: "center" }
           )
           .text(
-            ` ${item.total.toFixed(3)} ${invoice.currency.symbol}`,
+            ` ${item.total.toFixed(3)} `,
             450,
             yPosition,
             { align: "center" }
@@ -823,7 +823,7 @@ const generatePDF = (invoice, company) => {
         .text("Référence", 50, 270)
         .text("Article", 120, 270)
         .text("Quantité", 170, 270, { align: "center" })
-        .text("Prix", 270, 270, { align: "center" })
+        .text("Prix unt", 270, 270, { align: "center" })
         .text("Total", 400, 270, { align: "center" })
         .moveTo(50, 285)
         .lineTo(550, 285)
@@ -839,13 +839,13 @@ const generatePDF = (invoice, company) => {
         .text(item.article, 120, yPosition)
         .text(item.quantity, 170, yPosition, { align: "center" })
         .text(
-          ` ${item.price.toFixed(3)} ${invoice.currency.symbol}`,
+          ` ${item.price.toFixed(3)} `,
           270,
           yPosition,
           { align: "center" }
         )
         .text(
-          ` ${item.total.toFixed(3)} ${invoice.currency.symbol}`,
+          ` ${item.total.toFixed(3)} `,
           400,
           yPosition,
           { align: "center" }
@@ -1151,7 +1151,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
 
       .text("Article", 120, 270)
       .text("Quantité", 140, 270, { align: "center" })
-      .text("Prix", 300, 270, { align: "center" })
+      .text("Prix unt", 300, 270, { align: "center" })
       .text("Total", 450, 270, { align: "center" })
       .moveTo(50, 285)
       .lineTo(550, 285)
@@ -1168,13 +1168,13 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
         .text(item.article, 120, yPosition)
         .text(item.quantity, 140, yPosition, { align: "center" })
         .text(
-          ` ${item.price.toFixed(3)}${invoice.currency.symbol}`,
+          ` ${item.price.toFixed(3)}`,
           300,
           yPosition,
           { align: "center" }
         )
         .text(
-          ` ${item.total.toFixed(3)}${invoice.currency.symbol}`,
+          ` ${item.total.toFixed(3)}`,
           400,
           yPosition,
           { align: "center" }

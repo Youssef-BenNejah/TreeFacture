@@ -501,7 +501,7 @@ const Invoices = () => {
 
 
                             <div className="table-wrapper">
-                                <Table className="align-items-center table-flush">
+                                <Table className="align-items-center table-flush "reponsive>
                                     <thead className="thead-light">
                                         <tr>
                                             <th scope="col"><div className="select-all-container" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
