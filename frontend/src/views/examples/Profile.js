@@ -57,7 +57,7 @@ const Profile = () => {
       } else if (decodedToken.photo) {
         const imageUrl = decodedToken.photo.startsWith('http')
           ? decodedToken.photo
-          : `http://localhost:5000/${decodedToken.photo}`;
+          : `${process.env.REACT_APP_API_URL}/${decodedToken.photo}`;
         setPreviewImage(imageUrl);
         localStorage.setItem(`profileImage_${decodedToken.AdminID}`, imageUrl);
       }
@@ -70,7 +70,7 @@ const Profile = () => {
 
   const fetchCompany = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/companysetting/getByCreatedBy/${currentUserId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/companysetting/getByCreatedBy/${currentUserId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +115,7 @@ const Profile = () => {
       const token = localStorage.getItem('token');
       const { AdminID } = decodeToken(token);
       const response = await axios.post(
-        `http://localhost:5000/api/update/${AdminID}/`,
+        `${process.env.REACT_APP_API_URL}/api/update/${AdminID}/`,
         formData,
         {
           headers: {
@@ -129,7 +129,7 @@ const Profile = () => {
       if (updatedUser.photo) {
         const imageUrl = updatedUser.photo.startsWith('http')
           ? updatedUser.photo
-          : `http://localhost:5000/${updatedUser.photo}`;
+          : `${process.env.REACT_APP_API_URL}/${updatedUser.photo}`;
         setPreviewImage(imageUrl);
         localStorage.setItem(`profileImage_${AdminID}`, imageUrl);
       }
@@ -150,7 +150,7 @@ const Profile = () => {
       const token = localStorage.getItem('token');
       const { AdminID } = decodeToken(token);
       const response = await axios.post(
-        `http://localhost:5000/api/update/${AdminID}/`,
+        `${process.env.REACT_APP_API_URL}/api/update/${AdminID}/`,
         { password: newPassword },
         {
           headers: {

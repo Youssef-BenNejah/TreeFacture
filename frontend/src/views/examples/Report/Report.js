@@ -135,7 +135,7 @@ const Report = () => {
 
     const fetchCurrencies = async () => {
         try {
-            const currencyResponse = await axios.get("http://localhost:5000/api/currency", {
+            const currencyResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, {
                 params: { createdBy: currentUserId }
             }, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -148,7 +148,7 @@ const Report = () => {
 
     const fetchInvoices = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/invoices/${currentUserId}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${currentUserId}`, {
                 params: {
                     type: selectedType || undefined,  
                     status: selectedStatus || undefined,  

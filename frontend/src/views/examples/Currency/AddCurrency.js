@@ -18,7 +18,7 @@ const AddCurrency = ({ isOpen, toggle, refreshCurrencies, userId }) => {
     // Fetch existing currencies for the current user when component mounts
     const fetchUserCurrencies = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/currency`, { params: { createdBy: userId } });
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, { params: { createdBy: userId } });
         setUserCurrencies(response.data);
       } catch (error) {
         console.error("Error fetching user currencies:", error);
@@ -61,7 +61,7 @@ const AddCurrency = ({ isOpen, toggle, refreshCurrencies, userId }) => {
         createdBy: userId,
       };
 
-      const response = await axios.post('http://localhost:5000/api/currency', newCurrency, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/currency`, newCurrency, {
         headers: {
           'Content-Type': 'application/json',
         },

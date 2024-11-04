@@ -59,7 +59,7 @@ const Products = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/product", { params: { createdBy: currentUserId } });
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/product`, { params: { createdBy: currentUserId } });
 
 
             setProducts(response.data);
@@ -72,7 +72,7 @@ const Products = () => {
 
     const fetchCurrencies = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/currency", { params: { createdBy: currentUserId } });
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, { params: { createdBy: currentUserId } });
 
             setCurrencies(response.data);
         } catch (error) {
@@ -167,7 +167,7 @@ const Products = () => {
 
     const confirmDeleteProduct = async () => {
         try {
-            await axios.delete(`http://localhost:5000/api/product/${productToDelete}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/product/${productToDelete}`);
             refreshProducts();
             toggleDeleteModal();
             toast.success('Service supprimé avec succès', {

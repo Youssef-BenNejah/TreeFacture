@@ -56,7 +56,7 @@ const Expenses = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/depense", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/depense`, {
         params: { createdBy: currentUserId },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const Expenses = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/depense-categories", { params: { createdBy: currentUserId } });
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/depense-categories`, { params: { createdBy: currentUserId } });
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -151,7 +151,7 @@ const Expenses = () => {
 
   const confirmDeleteExpense = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/depense/${expenseToDelete}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/depense/${expenseToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

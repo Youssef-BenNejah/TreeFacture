@@ -47,7 +47,7 @@ const AddProductCategoryModal = ({ isOpen, toggle, userId, refreshCategories }) 
     e.preventDefault();
     try {
       console.log("Submitting with values:", { name: nom, description, color: color.value, createdBy: userId, enabled });
-      const response = await axios.post(`http://localhost:5000/api/category`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/category`, {
         name: nom,
         description,
         color: color.value,

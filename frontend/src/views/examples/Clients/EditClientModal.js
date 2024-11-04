@@ -38,8 +38,8 @@ const EditClientModal = ({ isOpen, toggle, refreshClients, userId, client }) => 
 
   const fetchPersonsAndCompanies = async () => {
     try {
-      const personsResponse = await axios.get('http://localhost:5000/api/people'); 
-      const companiesResponse = await axios.get('http://localhost:5000/api/entreprise'); 
+      const personsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/people`); 
+      const companiesResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/entreprise`); 
       setPersons(personsResponse.data);
       setCompanies(companiesResponse.data);
       filterData(personsResponse.data, companiesResponse.data);
@@ -70,7 +70,7 @@ const EditClientModal = ({ isOpen, toggle, refreshClients, userId, client }) => 
         person: clientType === 'Person' ? selectedPerson?.value : null,
         createdBy: userId
       };
-      await axios.put(`http://localhost:5000/api/client/${client._id}`, updatedClient); 
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/client/${client._id}`, updatedClient); 
       toast.success('Client modifié avec succès');
       refreshClients();
       toggle();

@@ -56,7 +56,7 @@ const Persons = () => {
 
   const fetchPeople = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/people");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/people`);
       const filteredPeople = response.data.filter(person => person.createdBy === currentUserId);
       setPeople(filteredPeople);
       console.log(people)
@@ -67,7 +67,7 @@ const Persons = () => {
 
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/entreprise");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/entreprise`);
       setCompanies(response.data);
     } catch (error) {
       console.error("Error fetching companies:", error);
@@ -148,7 +148,7 @@ const Persons = () => {
 
   const confirmDeletePerson = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/people/${personToDelete}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/people/${personToDelete}`);
       refreshPeople();
       toggleDeleteModal();
       toast.success('Personne supprimée avec succès', {

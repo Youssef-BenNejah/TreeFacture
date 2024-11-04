@@ -58,7 +58,7 @@ const EditCategoryModal = ({ isOpen, toggle, category, refreshCategories }) => {
       return;
     }
     try {
-      await axios.put(`http://localhost:5000/api/depense-categories/${category._id}`, {
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/depense-categories/${category._id}`, {
         name: nom,
         description,
         color: color.value,

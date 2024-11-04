@@ -44,7 +44,7 @@ function ExpenseCategory() {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/depense-categories`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/depense-categories`, {
                 params: { createdBy: currentUserId }
             });
             setCategories(response.data);
@@ -103,7 +103,7 @@ function ExpenseCategory() {
 
     const confirmDeleteCategory = async () => {
         try {
-            const response = await axios.delete(`http://localhost:5000/api/depense-categories/${categoryToDelete}`);
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/depense-categories/${categoryToDelete}`);
 
             if (response.status === 200) {
                 refreshCategories();

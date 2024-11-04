@@ -47,7 +47,7 @@ const Index = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/client', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/client`, {
         params: { createdBy: currentUserId }
       });
       setClients(response.data);
@@ -58,7 +58,7 @@ const Index = () => {
   };
   const fetchCurrencies = async () => {
     try {
-      const currencyResponse = await axios.get("http://localhost:5000/api/currency", {
+      const currencyResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, {
         params: { createdBy: currentUserId },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -73,7 +73,7 @@ const Index = () => {
 
   // const fetchInvoices = async () => {
   //   try {
-  //     const response = await axios.get(`http://localhost:5000/api/invoices/${currentUserId}`, {
+  //     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${currentUserId}`, {
   //       params: {
   //         type: selectedType || undefined,
   //         status: selectedStatus || undefined,
@@ -326,7 +326,7 @@ const Index = () => {
 
   const fetchPayment = async () => {
     try {
-      const paymentResponse = await axios.get(`http://localhost:5000/api/payments/createdBy/${currentUserId}`, {
+      const paymentResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/createdBy/${currentUserId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const paymentsThisMonth = paymentResponse.data.filter(payment => {
@@ -440,7 +440,7 @@ const Index = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/invoices/${currentUserId}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${currentUserId}`);
 
       // Check total number of invoices fetched
       console.log(`Total Invoices: ${response.data.length}`);

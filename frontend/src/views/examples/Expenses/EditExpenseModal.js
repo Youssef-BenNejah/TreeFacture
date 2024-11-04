@@ -32,7 +32,7 @@ const EditExpenseModal = ({ isOpen, toggle, expense, refreshExpenses, refreshCat
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/depense/${expense._id}`, formData, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/depense/${expense._id}`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

@@ -64,7 +64,7 @@ const AdminNavbar = (props) => {
       } else if (decodedToken.photo) {
         const imageUrl = decodedToken.photo.startsWith('http')
           ? decodedToken.photo
-          : `http://localhost:5000/${decodedToken.photo}`;
+          : `${process.env.REACT_APP_API_URL}/${decodedToken.photo}`;
         setPreviewImage(imageUrl);
         localStorage.setItem(`profileImage_${decodedToken.AdminID}`, imageUrl);
       }

@@ -47,7 +47,7 @@ function Clients() {
 
     const fetchClients = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/client', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/client`, {
                 params: { createdBy: adminId }
             });
             setClients(response.data);
@@ -98,7 +98,7 @@ function Clients() {
 
     const confirmDeleteCompany = async () => {
         try {
-            await axios.delete(`http://localhost:5000/api/client/${companyToDelete}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/client/${companyToDelete}`);
             refreshClients();
             toggleDeleteModal();
             toast.success('Client supprimée avec succès', {

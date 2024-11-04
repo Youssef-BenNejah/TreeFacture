@@ -39,7 +39,7 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
         console.log('Downloading PDF for invoice:', invoice);
     
         try {
-            const response = await axios.get(`http://localhost:5000/api/invoices/export-pdf/${invoice._id}/${invoice.createdBy}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/export-pdf/${invoice._id}/${invoice.createdBy}`, {
                 responseType: 'blob', 
             });
     
@@ -67,10 +67,10 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice,refreshInvoices }) => {
         console.log('Sending invoice via email...');
         
         try {
-            const response = await axios.get(`http://localhost:5000/api/invoices/export-pdf/send-email/${invoice._id}/${invoice.createdBy}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/export-pdf/send-email/${invoice._id}/${invoice.createdBy}`);
             
             if (response.status === 200) {
-                await axios.put(`http://localhost:5000/api/invoices/invoices/${invoice._id}`, {
+                await axios.put(`${process.env.REACT_APP_API_URL}/api/invoices/invoices/${invoice._id}`, {
                     status: 'Envoyé'
                 }, {
                     headers: {

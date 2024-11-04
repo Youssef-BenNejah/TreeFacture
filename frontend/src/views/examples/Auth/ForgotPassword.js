@@ -35,7 +35,7 @@ const ForgotPassword = () => {
     setLoading(true); 
     setError(''); 
     try {
-      const response = await axios.post('http://localhost:5000/api/sendotp', { email });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/sendotp`, { email });
       setMessage(response.data.message);
       setStep(2);
     } catch (error) {
@@ -50,7 +50,7 @@ const ForgotPassword = () => {
     setLoading(true); 
     setError(''); 
     try {
-      const response = await axios.post('http://localhost:5000/api/verfieropt', { email, otp });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verfieropt`, { email, otp });
       setMessage(response.data.message);
       setStep(3);
     } catch (error) {
@@ -73,7 +73,7 @@ const ForgotPassword = () => {
     setLoading(true); 
     setError(''); 
     try {
-      const response = await axios.post('http://localhost:5000/api/resetpassword', { email, newpassword: newPassword });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/resetpassword`, { email, newpassword: newPassword });
       setMessage(response.data.message);
       navigate('/login');
     } catch (error) {

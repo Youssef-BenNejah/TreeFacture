@@ -63,7 +63,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
 
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/entreprise`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/entreprise`);
       const filteredCompanies = response.data.filter(company => company.createdBy === userId);
       setCompanies(filteredCompanies);
     } catch (error) {
@@ -81,7 +81,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
 
   const checkUniqueness = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/people", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/people`, {
         params: { createdBy: userId }
       });
       const userPersons = response.data;
@@ -176,7 +176,7 @@ const EditPersonModal = ({ isOpen, toggle, person, refreshPeople, refreshCompani
     };
 
     try {
-      await axios.put(`http://localhost:5000/api/people/${person._id}`, updatedPerson);
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/people/${person._id}`, updatedPerson);
       refreshPeople();
       refreshCompanies();
       toggle();

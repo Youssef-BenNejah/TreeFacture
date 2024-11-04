@@ -49,7 +49,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
   useEffect(() => {
     const fetchTaxes = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/taxes", {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/taxes`, {
           params: { createdBy: userId, isActive: true },
         });
         setTaxOptions(
@@ -64,7 +64,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
     };
     const fetchClients = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/client", {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/client`, {
           params: { createdBy: userId },
         });
         setClientOptions(
@@ -94,7 +94,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
 
     const fetchCurrencies = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/currency", {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, {
           params: { createdBy: userId },
         });
         setCurrencyOptions(
@@ -204,7 +204,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
         formData.append("factureImage", factureImage);
       }
 
-      await axios.post("http://localhost:5000/api/invoices", formData, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/invoices`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -236,7 +236,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
   };
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/product", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/product`, {
         params: { createdBy: userId }, // Adjust according to your API
       });
       setProductOptions(

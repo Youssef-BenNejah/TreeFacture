@@ -17,7 +17,7 @@ const EditCurrencyModal = ({ isOpen, toggle, currency, refreshCurrencies, userId
   useEffect(() => {
     const fetchUserCurrencies = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/currency`, { params: { createdBy: userId } });
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, { params: { createdBy: userId } });
         setUserCurrencies(response.data);
       } catch (error) {
         console.error("Error fetching user currencies:", error);
@@ -67,7 +67,7 @@ const EditCurrencyModal = ({ isOpen, toggle, currency, refreshCurrencies, userId
         
       };
 
-      await axios.put(`http://localhost:5000/api/currency/${currency._id}`, updatedCurrency, {
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/currency/${currency._id}`, updatedCurrency, {
         headers: {
           'Content-Type': 'application/json',
         },

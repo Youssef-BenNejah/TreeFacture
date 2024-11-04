@@ -76,7 +76,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
 
   const fetchPeople = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/people");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/people`);
       setPeople(response.data.filter(person => person.createdBy === currentUserId));
     } catch (error) {
       console.error("Error fetching people:", error);
@@ -135,7 +135,7 @@ const EditCompanyModal = ({ isOpen, toggle, company, refreshCompany, userId }) =
     };
 
     try {
-      await axios.put(`http://localhost:5000/api/entreprise/${company._id}`, updatedCompany);
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/entreprise/${company._id}`, updatedCompany);
       console.log(updatedCompany)
       refreshCompany();
       toggle();

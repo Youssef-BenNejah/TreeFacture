@@ -57,7 +57,7 @@ const Currencies = () => {
 
     const fetchCurrencies = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/currency", {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, {
                 params: { createdBy: currentUserId },
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -134,7 +134,7 @@ const Currencies = () => {
 
     const confirmDeleteCurrency = async () => {
         try {
-            await axios.delete(`http://localhost:5000/api/currency/${currencyToDelete}`, {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/currency/${currencyToDelete}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

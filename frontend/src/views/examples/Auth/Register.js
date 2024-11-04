@@ -94,7 +94,7 @@ const Register = () => {
     // }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/register", formData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, formData);
       navigate('/auth/login');
       console.log("Registration successful:", response.data);
     } catch (error) {

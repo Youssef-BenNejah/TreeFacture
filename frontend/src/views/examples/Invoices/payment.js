@@ -47,7 +47,7 @@ const EnregistrerPaymentModal = ({ isOpen, toggle, invoice, refreshInvoices, use
 
         // Enregistrer the payment
         try {
-            await axios.post(`http://localhost:5000/api/payments/invoice/${invoice._id}`, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/payments/invoice/${invoice._id}`, {
                 amountPaid: amountValue,
                 paymentDate,
                 paymentMethod,

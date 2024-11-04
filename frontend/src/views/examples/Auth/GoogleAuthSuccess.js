@@ -10,7 +10,7 @@ const GoogleAuthSuccess = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const url = `http://localhost:5000/auth/login/success`; 
+        const url = `${process.env.REACT_APP_API_URL}/auth/login/success`; 
         const response = await axios.get(url, { withCredentials: true });
 
         if (response.data.token) {

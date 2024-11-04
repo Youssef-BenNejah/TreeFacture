@@ -14,7 +14,7 @@ const DisplayPaymentModal = ({ isOpen, toggle, invoice }) => {
     useEffect(() => {
         const fetchPayments = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/payments/invoice/${invoice._id}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/invoice/${invoice._id}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }

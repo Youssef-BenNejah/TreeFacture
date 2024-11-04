@@ -70,14 +70,30 @@ function convertNumberToFrenchText(number, curr) {
 
   // Conversion de la partie décimale
   const decimalText = convertDecimalToFrenchText(decimalPart);
+  console.log("Decimal Text:", decimalText); // Debug: Afficher le texte décimal
+  console.log("Current Currency:", curr); // Debug: Afficher la devise actuelle
 
   // Combiner les deux parties
   if (decimalText) {
-      text += " et " + decimalText.trim(); // Ajouter la partie décimale
-  }
+    console.log("Decimal Text is not empty."); // Debug
+    console.log("Current Currency:", curr); // Vérification de curr
+    console.log("Trimmed Currency:", curr.trim()); // Vérification de curr après trim
+    console.log("Type of Currency:", typeof curr); // Type de curr
+
+    if (curr && curr.trim() === "Dinar") { 
+        console.log("Currency is Dinar."); // Debug: Confirmer que curr est Dinar
+        text += " et " + decimalText.trim() + " millimes"; // Ajouter "millimes"
+    } else {
+        console.log("Currency is NOT Dinar."); // Debug: pour comprendre pourquoi else s'exécute
+        text += " et " + decimalText.trim(); // Ajouter la partie décimale
+    }
+}
+
 
   return text.trim();
 }
+
+
 // Setup storage and filename for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

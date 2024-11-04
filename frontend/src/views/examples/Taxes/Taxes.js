@@ -59,7 +59,7 @@ const Taxes = () => {
 
     const fetchTaxes = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/taxes", { params: { createdBy: currentUserId } });
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/taxes`, { params: { createdBy: currentUserId } });
             setTaxes(response.data);
         } catch (error) {
             console.error("Error fetching taxes:", error);
@@ -153,7 +153,7 @@ const Taxes = () => {
         }
 
         try {
-            await axios.delete(`http://localhost:5000/api/taxes/${taxToDelete}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/taxes/${taxToDelete}`);
             refreshTaxes();
             toggleDeleteModal();
             toast.success('Taxe supprimée avec succès', {

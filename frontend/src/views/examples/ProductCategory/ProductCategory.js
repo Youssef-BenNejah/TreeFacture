@@ -39,7 +39,7 @@ function ProductCategory() {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/category`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/category`, {
                 params: { createdBy: currentUserId }
             });
             setCategories(response.data);
@@ -92,7 +92,7 @@ function ProductCategory() {
 
     const confirmDeleteCategory = async () => {
         try {
-            const response = await axios.delete(`http://localhost:5000/api/category/${categoryToDelete}`);
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/category/${categoryToDelete}`);
 
             if (response.status === 200) {
                 refreshCategories();

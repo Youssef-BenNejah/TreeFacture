@@ -37,7 +37,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5000/api/login", formData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/login`, formData);
       const token = response.data.token;
       localStorage.setItem("token", token);
       console.log("Login successful:", response.data);
@@ -63,7 +63,7 @@ const Login = () => {
   };
 
   const googleAuth = () => {
-    window.open(`http://localhost:5000/auth/google`, "_self");
+    window.open(`${process.env.REACT_APP_API_URL}/auth/google`, "_self");
   };
 
   return (

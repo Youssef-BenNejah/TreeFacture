@@ -33,7 +33,7 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
         console.log('Downloading PDF for proforma invoice:', invoice);
 
         try {
-            const response = await axios.get(`http://localhost:5000/api/invoices/export-pdf/${invoice._id}/${invoice.createdBy}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/export-pdf/${invoice._id}/${invoice.createdBy}`, {
                 responseType: 'blob',
             });
 
@@ -60,7 +60,7 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
         console.log('Sending proforma invoice via email...');
 
         try {
-            const response = await axios.get(`http://localhost:5000/api/invoices/export-pdf/send-email/${invoice._id}/${invoice.createdBy}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/export-pdf/send-email/${invoice._id}/${invoice.createdBy}`);
             if (response.status === 200) {
                 setInvoice(prevInvoice => ({
                     ...prevInvoice,
@@ -84,7 +84,7 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
         setIsConverting(true);
 
         try {
-            const response = await axios.post(`http://localhost:5000/api/invoices/convert-to-facture/${invoice._id}`, null, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/invoices/convert-to-facture/${invoice._id}`, null, {
                 headers: {
                     Authorization: `Bearer ${userId}`
                 }
@@ -121,7 +121,7 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
                        
                     }}>
                         <img 
-                            src={`http://localhost:5000/${invoice.factureImage}`} 
+                            src={`${process.env.REACT_APP_API_URL}/${invoice.factureImage}`} 
                             alt={`Proforma Invoice Image`} 
                             style={{ 
                                 maxWidth: '100%',  // Scale down the image if it's too large

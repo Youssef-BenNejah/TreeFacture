@@ -29,7 +29,7 @@ const AddExpense = ({ isOpen, toggle, refreshExpenses, userId }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/depense-categories", { params: { createdBy: userId } });
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/depense-categories`, { params: { createdBy: userId } });
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -54,7 +54,7 @@ const AddExpense = ({ isOpen, toggle, refreshExpenses, userId }) => {
 
       console.log('Adding expense:', newExpense);
 
-      const response = await axios.post('http://localhost:5000/api/depense', newExpense, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/depense`, newExpense, {
         headers: {
           'Content-Type': 'application/json'
         }

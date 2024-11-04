@@ -74,7 +74,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
 
   const fetchPeople = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/people");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/people`);
       setPeople(response.data.filter(person => person.createdBy === currentUserId));
     } catch (error) {
       console.error("Error fetching people:", error);
@@ -121,7 +121,7 @@ const AddCompanyModal = ({ isOpen, toggle, refreshCompany, userId }) => {
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/api/entreprise", newCompany);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/entreprise`, newCompany);
       refreshCompany();
       toggle();
       toast.success('Entreprise ajoutée avec succès.', {

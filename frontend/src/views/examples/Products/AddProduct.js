@@ -30,7 +30,7 @@ const AddProduct = ({ isOpen, toggle, refreshProducts, userId }) => {
 
   const fetchCurrencies = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/currency", { params: { createdBy: userId } });
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, { params: { createdBy: userId } });
       setCurrencies(response.data);
     } catch (error) {
       console.error("Error fetching currencies:", error);
@@ -52,7 +52,7 @@ const AddProduct = ({ isOpen, toggle, refreshProducts, userId }) => {
         createdBy: userId
       };
 
-      await axios.post('http://localhost:5000/api/product', newProduct);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/product`, newProduct);
       refreshProducts();
       toggle();
       toast.success('Produit ajouté avec succès');
