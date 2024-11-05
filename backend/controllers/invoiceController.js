@@ -600,7 +600,7 @@ exports.generateInvoicePDF = async (req, res) => {
           { align: "right" }
         );
         doc.text(
-          `Add : ${invoice.client.person.adresse}`,
+          `Adresse : ${invoice.client.person.adresse}`,
           200,
           260, // Adjust y-position to place CIN below the name
           { align: "right" }
@@ -617,7 +617,7 @@ exports.generateInvoicePDF = async (req, res) => {
           { align: "right" }
         );
         doc.text(
-          `${invoice.client.entreprise.adresse}`,
+          `Adresse : ${invoice.client.entreprise.adresse}`,
           200,
           260, // Adjust y-position to place CIN below the name
           { align: "right" }
@@ -800,7 +800,7 @@ const generatePDF = (invoice, company) => {
         { align: "right" }
       );
       doc.text(
-        `Add  : ${invoice.client.person.address}`,
+        `Adresse : ${invoice.client.person.address}`,
         200,
         260, // Adjust y-position to place CIN below the name
         { align: "right" }
@@ -812,6 +812,12 @@ const generatePDF = (invoice, company) => {
       });
       doc.text(
         `Mf : ${invoice.client.entreprise.fisc}`,
+        200,
+        240, // Adjust y-position to place CIN below the name
+        { align: "right" }
+      );
+      doc.text(
+        `Adresse : ${invoice.client.entreprise.adresse}`,
         200,
         260, // Adjust y-position to place CIN below the name
         { align: "right" }
@@ -833,17 +839,17 @@ const generatePDF = (invoice, company) => {
         .fillColor("#5F259F")
         .fontSize(12)
 
-        .text("Référence", 50, 270)
-        .text("Article", 120, 270)
-        .text("Quantité", 170, 270, { align: "center" })
-        .text("Prix unt", 270, 270, { align: "center" })
-        .text("Total", 400, 270, { align: "center" })
-        .moveTo(50, 285)
-        .lineTo(550, 285)
+        .text("Référence", 50, 290)
+        .text("Article", 120, 290)
+        .text("Quantité", 170, 290, { align: "center" })
+        .text("Prix unt", 290, 290, { align: "center" })
+        .text("Total", 400, 290, { align: "center" })
+        .moveTo(50, 305)
+        .lineTo(550, 305)
         .stroke();
 
     // Add items
-    let yPosition = 300;
+    let yPosition = 320;
     invoice.items.forEach((item) => {
       doc
         .fillColor("black")
@@ -1133,7 +1139,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
           { align: "right" }
         );
         doc.text(
-          `Add : ${invoice.client.person.adresse}`,
+          `Adresse : ${invoice.client.person.adresse}`,
           200,
           260, // Adjust y-position to place CIN below the name
           { align: "right" }
@@ -1150,7 +1156,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
           { align: "right" }
         );
         doc.text(
-          `${invoice.client.entreprise.adresse}`,
+          `Adresse : ${invoice.client.entreprise.adresse}`,
           200,
           260, // Adjust y-position to place CIN below the name
           { align: "right" }
@@ -1161,18 +1167,18 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       .moveDown()
       .fillColor("#5F259F")
       .fontSize(12)
-      .text("Référence", 50, 270)
+      .text("Référence", 50, 290)
 
-      .text("Article", 120, 270)
-      .text("Quantité", 140, 270, { align: "center" })
-      .text("Prix unt", 300, 270, { align: "center" })
-      .text("Total", 450, 270, { align: "center" })
-      .moveTo(50, 285)
-      .lineTo(550, 285)
+      .text("Article", 120, 290)
+      .text("Quantité", 140, 290, { align: "center" })
+      .text("Prix unt", 300, 290, { align: "center" })
+      .text("Total", 450, 290, { align: "center" })
+      .moveTo(50, 305)
+      .lineTo(550, 305)
       .stroke();
 
     // Add items
-    let yPosition = 300;
+    let yPosition = 320;
     invoice.items.forEach((item) => {
       doc
         .fillColor("black")
