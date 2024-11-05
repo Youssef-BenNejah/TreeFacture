@@ -585,38 +585,33 @@ exports.generateInvoicePDF = async (req, res) => {
         .text(`Date : ${invoice.date.toLocaleDateString()}`, 50, 200)
         .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
         .moveDown();
-        doc.text(
-          ` Client :`,
-          200,
-          200,
-          { align: "right" }
-        );
+       
       if (invoice.client.person != null) {
         doc.text(
-          ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
+          `Client :  ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
           200,
           220,
           { align: "right" }
         );
         doc.text(
-          `${invoice.client.person.cin}`,
+          `Cin : ${invoice.client.person.cin}`,
           200,
           240, // Adjust y-position to place CIN below the name
           { align: "right" }
         );
         doc.text(
-          `${invoice.client.person.adresse}`,
+          `Add : ${invoice.client.person.adresse}`,
           200,
           260, // Adjust y-position to place CIN below the name
           { align: "right" }
         );
       }
       if (invoice.client.entreprise != null) {
-        doc.text(` ${invoice.client.entreprise.nom}`, 200, 220, {
+        doc.text(` Client : ${invoice.client.entreprise.nom}`, 200, 220, {
           align: "right",
         });
         doc.text(
-          `${invoice.client.entreprise.fisc}`,
+          `Mf : ${invoice.client.entreprise.fisc}`,
           200,
           240, // Adjust y-position to place CIN below the name
           { align: "right" }
@@ -789,34 +784,36 @@ const generatePDF = (invoice, company) => {
       .moveDown();
 
     // Add client information
-    doc.text(
-      ` Client :`,
-      200,
-      200,
-      { align: "right" }
-    );
+  
     if (invoice.client.person != null) {
       doc.text(
-        ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
+        ` Client : ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
         200,
         220,
         { align: "right" }
       );
+     
       doc.text(
-        `${invoice.client.person.cin}`,
+        `Cin : ${invoice.client.person.cin}`,
         200,
         240, // Adjust y-position to place CIN below the name
         { align: "right" }
       );
+      doc.text(
+        `Add  : ${invoice.client.person.address}`,
+        200,
+        260, // Adjust y-position to place CIN below the name
+        { align: "right" }
+      );
     }
     if (invoice.client.entreprise != null) {
-      doc.text(` ${invoice.client.entreprise.nom}`, 200, 220, {
+      doc.text(`Client :  ${invoice.client.entreprise.nom}`, 200, 220, {
         align: "right",
       });
       doc.text(
-        `${invoice.client.entreprise.fisc}`,
+        `Mf : ${invoice.client.entreprise.fisc}`,
         200,
-        240, // Adjust y-position to place CIN below the name
+        260, // Adjust y-position to place CIN below the name
         { align: "right" }
       );
     }
@@ -1121,38 +1118,33 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
       .moveDown();
 
-      doc.text(
-        ` Client :`,
-        200,
-        200,
-        { align: "right" }
-      );
+      
       if (invoice.client.person != null) {
         doc.text(
-          ` ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
+          ` Client : ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
           200,
           220,
           { align: "right" }
         );
         doc.text(
-          `${invoice.client.person.cin}`,
+          `Cin : ${invoice.client.person.cin}`,
           200,
           240, // Adjust y-position to place CIN below the name
           { align: "right" }
         );
         doc.text(
-          `${invoice.client.person.adresse}`,
+          `Add : ${invoice.client.person.adresse}`,
           200,
           260, // Adjust y-position to place CIN below the name
           { align: "right" }
         );
       }
       if (invoice.client.entreprise != null) {
-        doc.text(` ${invoice.client.entreprise.nom}`, 200, 220, {
+        doc.text(`Client :  ${invoice.client.entreprise.nom}`, 200, 220, {
           align: "right",
         });
         doc.text(
-          `${invoice.client.entreprise.fisc}`,
+          `Mf : ${invoice.client.entreprise.fisc}`,
           200,
           240, // Adjust y-position to place CIN below the name
           { align: "right" }
