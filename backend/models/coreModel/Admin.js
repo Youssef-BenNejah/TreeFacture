@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 const adminSchema = new Schema({
   removed: {
+    
     type: Boolean,
     default: false,
   },
