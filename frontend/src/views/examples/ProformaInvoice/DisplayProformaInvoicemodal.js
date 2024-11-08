@@ -30,6 +30,7 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
     };
 
     const handleDownloadPDF = async () => {
+        
         console.log('Downloading PDF for invoice:', invoice);
     
         try {
