@@ -99,32 +99,32 @@ const Invoices = () => {
                     status: selectedStatus || undefined,
                 }
             });
-
+    
             const filteredInvoices = response.data.filter(invoice => {
                 const invoiceDate = new Date(invoice.date);
                 const start = new Date(startDate);
                 const end = new Date(endDate);
-
-
+    
                 const currencyMatches = invoice?.currency?._id === selectedCurrency?._id;
                 const dateInRange =
                     (!startDate && !endDate) || // If no dates are selected, include all invoices
                     (invoiceDate >= start && invoiceDate <= end); // Date range check
-
+    
                 return currencyMatches && dateInRange;
             });
-            const sortedInvoices = filteredInvoices.sort((a, b) => new Date(b.date) - new Date(a.date));
-            setInvoices(sortedInvoices);
+    
+            // Set the state with the filtered invoices
+            setInvoices(filteredInvoices);
             setTotalPaid(calculateTotalPaid(filteredInvoices));
             setTotalUnPaid(calculateTotalUnPaid(filteredInvoices));
-
-
+    
             console.log(filteredInvoices);
         } catch (error) {
             console.error("Error fetching invoices:", error);
         }
     };
-
+    
+    
 
     const refreshInvoices = () => {
         fetchInvoices();

@@ -119,7 +119,9 @@ const invoiceSchema = new mongoose.Schema({
     default: Date.now,
   },
   factureImage: { type: String } 
-});
+  
+  
+},{ timestamps: true });
 
 invoiceSchema.plugin(require('mongoose-autopopulate'));
 

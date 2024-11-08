@@ -17,7 +17,12 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTag, faList, faDollarSign, faMoneyBill, faFileAlt, faBarcode } from '@fortawesome/free-solid-svg-icons';
-
+const decodeToken = (token) => {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const payload = JSON.parse(atob(base64));
+  return payload;
+};
 const EditProduct = ({ isOpen, toggle, refreshProducts, product, userId }) => {
   const [name, setName] = useState('');
   const [currency, setCurrency] = useState('');
@@ -25,13 +30,29 @@ const EditProduct = ({ isOpen, toggle, refreshProducts, product, userId }) => {
   const [description, setDescription] = useState('');
   const [reference, setReference] = useState('');
   const [currencies, setCurrencies] = useState([]);
+  const [selectedInvoices, setSelectedInvoices] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [totalPaid, setTotalPaid] = useState(0);
+  const [totalUnPaid, setTotalUnPaid] = useState(0);
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [invoices, setInvoices] = useState([]);
+
 
   
-
+  const token = localStorage.getItem('token');
+  const decodedToken = token ? decodeToken(token) : {};
+  const currentUserId = decodedToken.AdminID;
+  const username = decodedToken.name;
+  const userlastname = decodedToken.surname;
   const fetchCurrencies = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, { params: { createdBy: userId } });
       setCurrencies(response.data);
+      console.log(currencies)
     } catch (error) {
       console.error("Error fetching currencies:", error);
     }
@@ -69,7 +90,43 @@ const EditProduct = ({ isOpen, toggle, refreshProducts, product, userId }) => {
       toast.error('Erreur lors de la mise à jour du produit. Veuillez réessayer.');
     }
   };
+  const fetchInvoices = async () => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${currentUserId}`, {
+            params: {
+                type: selectedType || undefined,
+                status: selectedStatus || undefined,
+            }
+        });
 
+        const filteredInvoices = response.data.filter(invoice => {
+            const invoiceDate = new Date(invoice.date);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            const currencyMatches = invoice?.currency?._id === selectedCurrency?._id;
+            const dateInRange =
+                (!startDate && !endDate) || // If no dates are selected, include all invoices
+                (invoiceDate >= start && invoiceDate <= end); // Date range check
+
+            return currencyMatches && dateInRange;
+        });
+
+        // Set the state with the filtered invoices
+        setInvoices(filteredInvoices);
+        
+
+        console.log(filteredInvoices);
+    } catch (error) {
+        console.error("Error fetching invoices:", error);
+    }
+};
+
+
+
+const refreshInvoices = () => {
+    fetchInvoices();
+};
   return (
     <Modal isOpen={isOpen} toggle={toggle} className="modal-right">
       <ModalHeader toggle={toggle}>Modifier service</ModalHeader>
@@ -109,7 +166,6 @@ const EditProduct = ({ isOpen, toggle, refreshProducts, product, userId }) => {
               >
                 <option value="" disabled>Sélectionnez une devise </option>
                 {currencies
-                  .filter((currency) => currency.active) 
                   .map((currency) => (
                     <option key={currency._id} value={currency._id}>
                       {currency.name} ({currency.code})
