@@ -221,18 +221,20 @@ exports.getInvoices = async (req, res) => {
       filter.createdBy = createdBy; // Filter by the creator's ID
     }
 
-    // Find invoices with applied filters and populate references
+    // Find invoices with applied filters, sort by createdAt in descending order, and populate references
     const invoices = await Invoice.find(filter)
+      .sort({ createdAt: -1 }) // Sort invoices by creation date in descending order
       .populate("client")
       .populate("currency")
       .populate("tax");
 
-    // Return the filtered invoices in the response
+    // Return the filtered and sorted invoices in the response
     res.status(200).json(invoices);
   } catch (error) {
     res.status(500).json({ message: "Error fetching invoices", error });
   }
 };
+
 
 // Get a single invoice by its ID
 exports.getInvoiceById = async (req, res) => {
@@ -714,7 +716,7 @@ exports.generateInvoicePDF = async (req, res) => {
         yPosition,
         { align: "right" }
       );
-      const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
+      const text = convertNumberToFrenchText(invoice.total.toFixed(3),invoice.currency.name);
 
       yPosition += 15;
       doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {

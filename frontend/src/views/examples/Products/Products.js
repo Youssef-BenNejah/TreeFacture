@@ -335,6 +335,8 @@ const Products = () => {
                     product={productToEdit}
                     refreshProducts={refreshProducts}
                     categories={categories}
+                    userId={currentUserId}
+
                 />}
 
         </>
