@@ -135,11 +135,11 @@ const routes = [
     component: <Login />,
     layout: "/auth",
   },
-  !isAuthenticated && {
-    path: "/register",
-    component: <Register />,
-    layout: "/auth",
-  },
+  // !isAuthenticated && {
+  //   path: "/register",
+  //   component: <Register />,
+  //   layout: "/auth",
+  // },
   !isAuthenticated && {
     path: "/forgot-password",
     component: <ForgotPassword />,

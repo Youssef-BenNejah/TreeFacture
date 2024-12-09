@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp, faArrowDown,faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -43,8 +43,28 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [totalPaid, setTotalPaid] = useState(0);
   const [totalUnPaid, setTotalUnPaid] = useState(0);
+  const navigate = useNavigate();
 
-
+  const verifySession = async () => {
+    const token = localStorage.getItem("token");
+   
+  
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/session`,{}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Session verified:", response.data.message);
+    } catch (error) {
+      const message = error.response?.data?.message || "Session expired. Please log in again.";
+      console.log(message)
+      logout(message);
+    }
+  };
+  const logout = (reason = "You have been logged out.") => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("tokenExpiration");
+    navigate("/auth/login");
+  };
   const fetchClients = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/client`, {
@@ -431,6 +451,7 @@ const Index = () => {
   const toggleCurrencyDropdown = () => setCurrencyDropdownOpen(!currencyDropdownOpen);
 
   useEffect(() => {
+    verifySession();
     fetchCurrencies();
     fetchInvoices();
     fetchClients();

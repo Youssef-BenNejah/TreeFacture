@@ -39,12 +39,15 @@ exports.login = async (req, res) => {
   try {
     // Check if the super admin exists
     const superAdmin = await SuperAdmin.findOne({ email });
+    console.log(password)
+    console.log(superAdmin.password)
+
     if (!superAdmin) {
       return res.status(400).json({ message: 'Super admin not found' });
     }
 
     // Compare the provided password with the stored hash
-    const passwordMatch = await bcrypt.compare(password, superAdmin.password);
+    const passwordMatch =  bcrypt.compare(password, superAdmin.password);
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Incorrect email or password' });
     }

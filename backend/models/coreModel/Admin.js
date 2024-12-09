@@ -52,7 +52,7 @@ const adminSchema = new Schema({
   etat: {
     type: String,
     enum: ['active', 'suspended', 'notActive'], // Possible states
-    default: 'notActive', // Default is active
+    default: 'active', // Default is active
   },
   planExpiration: { type: Date, required: true }, // Field for plan expiration
 });

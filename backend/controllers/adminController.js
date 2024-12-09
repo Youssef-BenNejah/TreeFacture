@@ -14,14 +14,16 @@ exports.register = async (req, res) => {
       if (existingAdmin) {
           return res.status(400).json({ message: 'Email already exists' });
       }
-      const planExpiration = new Date();
-      planExpiration.setDate(planExpiration.getDate() + 15); // Add 15 days  
+      // const planExpiration = new Date();
+      // planExpiration.setDate(planExpiration.getDate() + 15); // Add 15 days  
       const newAdmin = new Admin({
           email: req.body.email,
           name: req.body.name,
           surname: req.body.surname,
           password: req.body.password,
-          planExpiration,
+          etat: req.body.etat,
+
+          planExpiration : req.body.planExpiration,
       });
       await newAdmin.save();
 
@@ -107,11 +109,11 @@ exports.login = async (req, res) => {
     }
 
     if (userData.etat === 'notActive') {
-      return res.status(403).json({ message: 'Your account is not active. Please contact support.' });
+      return res.status(406).json({ message: 'Your account is not active. Please contact support.' });
     }
     const currentDate = new Date();
     if (userData.planExpiration && userData.planExpiration < currentDate) {
-      return res.status(403).json({ message: 'Your subscription has expired. Please renew your plan to log in.' });
+      return res.status(409).json({ message: 'Your subscription has expired. Please renew your plan to log in.' });
     }
     // Generate new JWT with 4-hour expiration
     const token = jwt.sign(
