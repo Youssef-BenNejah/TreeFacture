@@ -26,6 +26,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const decodeToken = (token) => {
   const base64Url = token.split('.')[1];
@@ -49,6 +50,28 @@ const Persons = () => {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [displayModalOpen, setDisplayModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const verifySession = async () => {
+      const token = localStorage.getItem("token");
+     
+    
+      try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Session verified:", response.data.message);
+      } catch (error) {
+        const message = error.response?.data?.message || "Session expired. Please log in again.";
+        console.log(message)
+        logout(message);
+      }
+    };
+    const logout = (reason = "You have been logged out.") => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("tokenExpiration");
+      navigate("/auth/login");
+    };
 
   const token = localStorage.getItem('token');
   const decodedToken = token ? decodeToken(token) : {};
@@ -75,6 +98,7 @@ const Persons = () => {
   };
 
   useEffect(() => {
+    verifySession();
     fetchPeople();
     fetchCompanies();
   }, []);

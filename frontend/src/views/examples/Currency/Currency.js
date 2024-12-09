@@ -27,6 +27,7 @@ import AddCurrency from "./AddCurrency";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import DisplayCurrencyModal from "./DisplayCurrencyModal";
 import EditCurrencyModal from "./EditCurrencyModal";
+import { useNavigate } from "react-router-dom";
 
 const decodeToken = (token) => {
     const base64Url = token.split('.')[1];
@@ -49,7 +50,28 @@ const Currencies = () => {
     const [dropdownOpen, setDropdownOpen] = useState(null);
     const [selectedCurrency, setSelectedCurrency] = useState(null);
     const [displayModalOpen, setDisplayModalOpen] = useState(false);
-    
+    const navigate = useNavigate();
+
+    const verifySession = async () => {
+        const token = localStorage.getItem("token");
+       
+      
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log("Session verified:", response.data.message);
+        } catch (error) {
+          const message = error.response?.data?.message || "Session expired. Please log in again.";
+          console.log(message)
+          logout(message);
+        }
+      };
+      const logout = (reason = "You have been logged out.") => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("tokenExpiration");
+        navigate("/auth/login");
+      };
 
     const token = localStorage.getItem('token');
     const decodedToken = token ? decodeToken(token) : {};
@@ -70,6 +92,7 @@ const Currencies = () => {
     };
 
     useEffect(() => {
+        verifySession();
         fetchCurrencies();
     }, [currentUserId, token]);
 

@@ -50,7 +50,7 @@ const Index = () => {
    
   
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/session`,{}, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Session verified:", response.data.message);

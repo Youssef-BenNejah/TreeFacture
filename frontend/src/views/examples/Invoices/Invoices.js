@@ -29,6 +29,7 @@ import AddInvoiceModal from "../Invoices/AddInvoiceModal";
 import EditInvoiceModal from "./EditInvoiceModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import PaymentModal from "./payment";
+import { useNavigate } from "react-router-dom";
 
 
 const decodeToken = (token) => {
@@ -67,7 +68,28 @@ const Invoices = () => {
     const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
 
 
+    const navigate = useNavigate();
 
+    const verifySession = async () => {
+        const token = localStorage.getItem("token");
+       
+      
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log("Session verified:", response.data.message);
+        } catch (error) {
+          const message = error.response?.data?.message || "Session expired. Please log in again.";
+          console.log(message)
+          logout(message);
+        }
+      };
+      const logout = (reason = "You have been logged out.") => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("tokenExpiration");
+        navigate("/auth/login");
+      };
 
 
 
@@ -183,6 +205,7 @@ const Invoices = () => {
 
 
     useEffect(() => {
+        verifySession();
         fetchInvoices();
         fetchClients();
         fetchTaxes();

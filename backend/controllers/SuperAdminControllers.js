@@ -82,3 +82,38 @@ exports.getAllAdmins = async (req, res) => {
     }
   };
   
+
+// Update Admin Status or Plan by SuperAdmin
+exports.updateAdmin = async (req, res) => {
+  const { adminId } = req.params; // ID of the admin to update
+  const { etat, planExpiration } = req.body; // etat = 'suspended', 'notActive', 'active', etc. | planDuration in days
+
+  try {
+    const Admin = await admin.findById(adminId);
+
+    if (!Admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    // Update the status (etat) if provided
+    if (etat) {
+      Admin.etat = etat;
+    }
+
+    // Update the plan expiration date if provided
+    if (planExpiration) {
+      const newExpiration = new Date();
+      newExpiration.setDate(newExpiration.getDate() + parseInt(planExpiration)); // Extend plan by specified days
+      Admin.planExpiration = newExpiration;
+    }
+
+    // Save the updated Admin
+    await Admin.save();
+
+    res.status(200).json({ message: 'Admin updated successfully', Admin });
+
+  } catch (error) {
+    console.error('Error updating Admin:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

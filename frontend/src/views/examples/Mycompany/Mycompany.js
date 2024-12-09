@@ -23,6 +23,7 @@ import Header from 'components/Headers/ElementHeader';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Flag from 'react-world-flags';
+import { useNavigate } from 'react-router-dom';
 
 const decodeToken = (token) => {
     const base64Url = token.split('.')[1];
@@ -64,6 +65,30 @@ const CompanyComponent = () => {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [matriculefisc, setMatriculefisc] = useState('');
+    const navigate = useNavigate();
+
+    const verifySession = async () => {
+        const token = localStorage.getItem("token");
+       
+      
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log("Session verified:", response.data.message);
+        } catch (error) {
+          const message = error.response?.data?.message || "Session expired. Please log in again.";
+          console.log(message)
+          logout(message);
+        }
+      };
+      const logout = (reason = "You have been logged out.") => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("tokenExpiration");
+        navigate("/auth/login");
+      };
+
+
 
     
    
@@ -77,6 +102,7 @@ const CompanyComponent = () => {
     }));
 
     useEffect(() => {
+        verifySession();
         fetchCompany();
     }, [currentUserId]);
 

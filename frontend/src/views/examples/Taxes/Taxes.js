@@ -29,6 +29,7 @@ import DisplayTaxModal from "./DisplayTaxModal ";
 import EditTaxModal from "./EditTaxModal ";
 
 import ConfirmDeleteModal from "./ConfirmDeleteModal ";
+import { useNavigate } from "react-router-dom";
 
 
 const decodeToken = (token) => {
@@ -52,7 +53,28 @@ const Taxes = () => {
     const [dropdownOpen, setDropdownOpen] = useState(null);
     const [selectedTax, setSelectedTax] = useState(null);
     const [displayModalOpen, setDisplayModalOpen] = useState(false);
+    const navigate = useNavigate();
 
+    const verifySession = async () => {
+        const token = localStorage.getItem("token");
+       
+      
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log("Session verified:", response.data.message);
+        } catch (error) {
+          const message = error.response?.data?.message || "Session expired. Please log in again.";
+          console.log(message)
+          logout(message);
+        }
+      };
+      const logout = (reason = "You have been logged out.") => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("tokenExpiration");
+        navigate("/auth/login");
+      };
     const token = localStorage.getItem('token');
     const decodedToken = token ? decodeToken(token) : {};
     const currentUserId = decodedToken.AdminID;
@@ -67,6 +89,7 @@ const Taxes = () => {
     };
 
     useEffect(() => {
+        verifySession();
         fetchTaxes();
     }, []);
 
