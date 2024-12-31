@@ -49,9 +49,12 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
   useEffect(() => {
     const fetchTaxes = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/taxes`, {
-          params: { createdBy: userId, isActive: true },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/taxes`,
+          {
+            params: { createdBy: userId, isActive: true },
+          }
+        );
         setTaxOptions(
           response.data.map((tax) => ({
             value: tax._id,
@@ -64,9 +67,12 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
     };
     const fetchClients = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/client`, {
-          params: { createdBy: userId },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/client`,
+          {
+            params: { createdBy: userId },
+          }
+        );
         setClientOptions(
           response.data.map((client) => {
             if (client.type === "Person" && client.person) {
@@ -94,9 +100,12 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
 
     const fetchCurrencies = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, {
-          params: { createdBy: userId },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/currency`,
+          {
+            params: { createdBy: userId },
+          }
+        );
         setCurrencyOptions(
           response.data.map((currency) => ({
             value: currency._id,
@@ -153,8 +162,46 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
     return invoice.items.reduce((acc, item) => acc + item.total, 0);
   };
 
-  const handleTaxChange = (e) => {
-    setSelectedTax(e.target.value);
+  const handleTaxChange = (e, index) => {
+    const selectedTaxValue = e.target.value;
+    const selectedTaxOption = taxOptions.find(
+      (tax) => tax.value === selectedTaxValue
+    );
+
+    if (selectedTaxOption) {
+      const taxRate = parseFloat(selectedTaxOption.label.split(" - ")[1]); // Taux de taxe
+      const newItems = [...invoice.items];
+      const baseAmount = newItems[index].quantity * newItems[index].price;
+
+      // Ajouter ou mettre à jour la taxe dans l'array taxes
+      const existingTaxIndex = (newItems[index].taxes || []).findIndex(
+        (tax) => tax.taxRate === taxRate
+      );
+
+      if (existingTaxIndex >= 0) {
+        // Mettre à jour une taxe existante
+        newItems[index].taxes[existingTaxIndex].taxAmount =
+          baseAmount * (taxRate / 100);
+      } else {
+        // Ajouter une nouvelle taxe
+        newItems[index].taxes = [
+          ...(newItems[index].taxes || []),
+          {
+            taxRate,
+            taxAmount: baseAmount * (taxRate / 100),
+            taxName: selectedTaxOption.label.split(" - ")[0],
+          },
+        ];
+      }
+
+      // Recalculer le total avec toutes les taxes
+      newItems[index].total =
+        baseAmount +
+        newItems[index].taxes.reduce((acc, tax) => acc + tax.taxAmount, 0);
+
+      // Mettre à jour l'état
+      setInvoice({ ...invoice, items: newItems });
+    }
   };
 
   useEffect(() => {
@@ -182,7 +229,6 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
       formData.append("type", invoice.type);
       formData.append("timbre", invoice.timbre);
 
-
       // Append items to FormData
       invoice.items.forEach((item, index) => {
         formData.append(`items[${index}][ref]`, item.ref);
@@ -191,6 +237,20 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
         formData.append(`items[${index}][quantity]`, item.quantity);
         formData.append(`items[${index}][price]`, item.price);
         formData.append(`items[${index}][total]`, item.total);
+        item.taxes.forEach((tax, taxIndex) => {
+          formData.append(
+            `items[${index}][taxes][${taxIndex}][taxRate]`,
+            tax.taxRate
+          );
+          formData.append(
+            `items[${index}][taxes][${taxIndex}][taxAmount]`,
+            tax.taxAmount
+          );
+          formData.append(
+            `items[${index}][taxes][${taxIndex}][taxName]`,
+            tax.taxName
+          );
+        });
       });
 
       formData.append("subtotal", calculateSubtotal());
@@ -204,11 +264,15 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
         formData.append("factureImage", factureImage);
       }
 
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/invoices`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/invoices`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       // Show success toast
       toast.success("Invoice added successfully!");
@@ -236,9 +300,12 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
   };
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/product`, {
-        params: { createdBy: userId }, // Adjust according to your API
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/product`,
+        {
+          params: { createdBy: userId }, // Adjust according to your API
+        }
+      );
       setProductOptions(
         response.data.map((product) => ({
           value: product._id,
@@ -342,7 +409,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
                 value={invoice.currency}
                 onChange={handleInputChange}
               >
-                <option value="">Select Currency</option>
+                <option value=""> Selectionnez devise</option>
                 {currencyOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -365,7 +432,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
         <h5>Services</h5>
         {invoice.items.map((item, index) => (
           <Row form key={index} className="align-items-center">
-            <Col md={5}>
+            <Col md={4}>
               <FormGroup>
                 <Label for={`product-${index}`}>Service</Label>
                 <Input
@@ -381,8 +448,29 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
                     )
                   }
                 >
-                  <option value="">Selectionnez un service</option>
+                  <option value="" selected disabled>
+                    {invoice.items[index].article}
+                  </option>
                   {productOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
+            </Col>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="tax">Tax</Label>
+                <Input
+                  type="select"
+                  id={`tax-${index}`}
+                  onChange={(e) => handleTaxChange(e, index)}
+                >
+                  <option value="" selected disabled>
+                    {invoice.items[index].taxes?.[0]?.taxRate || "No tax"}
+                  </option>
+                  {taxOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -392,7 +480,7 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
             </Col>
             <Col md={1}>
               <FormGroup>
-                <Label for={`quantity-${index}`}>Quantité</Label>
+                <Label for={`quantity-${index}`}>Qt</Label>
                 <Input
                   type="number"
                   name={`quantity-${index}`}
@@ -400,23 +488,30 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
                   value={item.quantity}
                   onChange={(e) => {
                     const newItems = [...invoice.items];
-                    newItems[index].quantity = e.target.value;
-                    newItems[index].total =
-                      newItems[index].quantity * newItems[index].price;
-                    setInvoice({ ...invoice, items: newItems });
+                    const updatedQuantity = parseFloat(e.target.value);
+
+                    if (!isNaN(updatedQuantity)) {
+                      newItems[index].quantity = updatedQuantity;
+
+                      const baseAmount =
+                        updatedQuantity * parseFloat(newItems[index].price);
+
+                      newItems[index].taxes = (newItems[index].taxes || []).map(
+                        (tax) => ({
+                          ...tax,
+                          taxAmount: baseAmount * (tax.taxRate / 100),
+                        })
+                      );
+
+                      const totalTaxAmount = newItems[index].taxes.reduce(
+                        (acc, tax) => acc + tax.taxAmount,
+                        0
+                      );
+                      newItems[index].total = baseAmount + totalTaxAmount;
+
+                      setInvoice({ ...invoice, items: newItems });
+                    }
                   }}
-                />
-              </FormGroup>
-            </Col>
-            <Col md={2}>
-              <FormGroup>
-                <Label for={`ref-${index}`}></Label>
-                <Input
-                  type="number"
-                  name={`ref-${index}`}
-                  id={`ref-${index}`}
-                  value={item.ref}
-                  readOnly
                 />
               </FormGroup>
             </Col>
@@ -434,11 +529,12 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
             </Col>
             <Col md={2}>
               <Button color="danger" onClick={() => removeItem(index)}>
-                Supprimer
+                X
               </Button>
             </Col>
           </Row>
         ))}
+
         <Button color="primary" onClick={addItem}>
           Ajouter
         </Button>
@@ -457,7 +553,6 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
             </FormGroup>
           </Col>
         </Row>
-
         <Row>
           <Col md={2}>
             <FormGroup>
@@ -471,50 +566,47 @@ const AddProformaInvoice = ({ isOpen, toggle, refreshInvoices, userId }) => {
               />
             </FormGroup>
           </Col>
-          <Col md={5}>
+
+          <Col md={4}>
             <FormGroup>
-              <Label for="tax">Tax</Label>
-              <Input
-                type="select"
-                id="tax"
-                value={selectedTax}
-                onChange={handleTaxChange}
-              >
-                <option value="">Select Tax</option>
-                {taxOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
-          </Col>
-          <Col md={5}>
-            <FormGroup>
-              <Label for="subtotal">Subtotal</Label>
+              <Label for="subtotal">Total</Label>
               <Input
                 type="text"
                 id="subtotal"
-                value={calculateSubtotal()}
+                value={calculateSubtotal() + parseFloat(invoice.timbre || 0)}
+                readOnly
+              />
+            </FormGroup>
+          </Col>
+          <Col md={3}>
+            <FormGroup>
+              <Label for="taxAmount">Tax Amount</Label>
+              <Input
+                type="text"
+                id="taxAmount"
+                value={
+                  (parseFloat(invoice.taxAmount) || 0) +
+                  (parseFloat(invoice.timbre) || 0)
+                }
                 readOnly
               />
             </FormGroup>
           </Col>
         </Row>
-        <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="taxAmount">Tax Amount</Label>
-              <Input type="text" id="taxAmount" value={taxAmount} readOnly />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="total">Total</Label>
-              <Input type="text" id="total" value={invoiceTotal+parseFloat(invoice.timbre || 0)} readOnly />
-            </FormGroup>
-          </Col>
-        </Row>
+        {/* <Row>
+               
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="total">Total</Label>
+                    <Input
+                      type="text"
+                      id="total"
+                      value={invoiceTotal + parseFloat(invoice.timbre || 0)}
+                      readOnly
+                    />
+                  </FormGroup>
+                </Col>
+              </Row> */}
       </ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={toggle}>

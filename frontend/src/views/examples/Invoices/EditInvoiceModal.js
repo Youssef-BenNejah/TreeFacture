@@ -37,6 +37,7 @@ const EditInvoiceModal = ({
         quantity: 1,
         price: 0,
         total: 0,
+        taxes: [],
       },
     ],
     paidAmount: 0,
@@ -69,7 +70,7 @@ const EditInvoiceModal = ({
         setTaxOptions(
           response.data.map((tax) => ({
             value: tax._id,
-            label: `${tax.taxvalue}%`,
+            label: `${tax.name} - ${tax.taxvalue}%`,
           }))
         );
       } catch (error) {
@@ -183,23 +184,76 @@ const EditInvoiceModal = ({
     return invoice.items.reduce((acc, item) => acc + item.total, 0);
   };
 
-  const handleTaxChange = (e) => {
-    const newTaxId = e.target.value;
-    console.log("New tax ID:", newTaxId);
+  const handleTaxChange = (e, index) => {
+    const selectedTaxValue = e.target.value;
+    const selectedTaxOption = taxOptions.find(
+      (tax) => tax.value === selectedTaxValue
+    );
 
-    // Find the selected tax option (the full object)
-    const selectedTaxOption = taxOptions.find((tax) => tax.value === newTaxId);
-    console.log("Selected tax option:", selectedTaxOption);
+    if (selectedTaxOption) {
+      const taxRate = parseFloat(selectedTaxOption.label.split(" - ")[1]); // Extract tax rate
+      const taxName = selectedTaxOption.label.split(" - ")[0]; // Extract tax name
 
-    // Update the selected tax with the full tax object, not just the ID
-    setSelectedTax(selectedTaxOption);
+      setInvoice((prevInvoice) => {
+        const newItems = [...prevInvoice.items];
+        const baseAmount =
+          (parseFloat(newItems[index].quantity) || 0) *
+          (parseFloat(newItems[index].price) || 0);
 
-    // Update the invoice object with the new tax
-    setInvoice((prevInvoice) => ({
-      ...prevInvoice,
-      tax: selectedTaxOption, // Update the tax in the invoice object
-    }));
+        // Replace or update the tax for this item
+        newItems[index].taxes = [
+          {
+            taxRate,
+            taxAmount: baseAmount * (taxRate / 100),
+            taxName,
+          },
+        ];
+
+        // Recalculate the total including taxes
+        const taxTotal = newItems[index].taxes.reduce(
+          (acc, tax) => acc + tax.taxAmount,
+          0
+        );
+        newItems[index].total = baseAmount + taxTotal;
+
+        return { ...prevInvoice, items: newItems };
+      });
+    }
   };
+  const areItemsEqual = (items1, items2) => {
+    return JSON.stringify(items1) === JSON.stringify(items2);
+  };
+
+  useEffect(() => {
+    const updatedItems = invoice.items.map((item) => {
+      const baseAmount =
+        (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0);
+
+      const updatedTaxes = item.taxes.map((tax) => ({
+        ...tax,
+        taxAmount: baseAmount * (tax.taxRate / 100),
+      }));
+
+      const taxTotal = updatedTaxes.reduce(
+        (acc, tax) => acc + tax.taxAmount,
+        0
+      );
+
+      return {
+        ...item,
+        taxes: updatedTaxes,
+        total: baseAmount + taxTotal,
+      };
+    });
+
+    if (!areItemsEqual(updatedItems, invoice.items)) {
+      setInvoice((prevInvoice) => ({
+        ...prevInvoice,
+        items: updatedItems,
+      }));
+    }
+  }, [invoice.items]);
+
   const handleCurrencyChange = (e) => {
     const newCurrencyId = e.target.value;
     console.log("New currency ID:", newCurrencyId);
@@ -297,10 +351,27 @@ const EditInvoiceModal = ({
         formData.append(`items[${index}][quantity]`, item.quantity);
         formData.append(`items[${index}][price]`, item.price);
         formData.append(`items[${index}][total]`, item.total);
+        item.taxes.forEach((tax, taxIndex) => {
+          formData.append(
+            `items[${index}][taxes][${taxIndex}][taxRate]`,
+            tax.taxRate
+          );
+          formData.append(
+            `items[${index}][taxes][${taxIndex}][taxAmount]`,
+            tax.taxAmount
+          );
+          formData.append(
+            `items[${index}][taxes][${taxIndex}][taxName]`,
+            tax.taxName
+          );
+        });
       });
 
       // Append subtotal and tax
-      formData.append("subtotal", calculateSubtotal());
+      formData.append(
+        "subtotal",
+        calculateSubtotal() + parseFloat(invoice.timbre || 0)
+      );
 
       // Log and append selected tax
       console.log("Selected Tax:", selectedTax);
@@ -600,7 +671,7 @@ const EditInvoiceModal = ({
         <h5>Services</h5>
         {invoice.items.map((item, index) => (
           <Row form key={index} className="align-items-center">
-            <Col md={5}>
+            <Col md={4}>
               <FormGroup>
                 <Label for={`product-${index}`}>Service</Label>
                 <Input
@@ -616,20 +687,40 @@ const EditInvoiceModal = ({
                     )
                   }
                 >
-                  <option value=""selected disabled>{invoice.items[index].article}</option>
-                  {productOptions
-                     
-                    .map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                  <option value="" selected disabled>
+                    {invoice.items[index].article}
+                  </option>
+                  {productOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
+            </Col>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="tax">Tax</Label>
+                <Input
+                  type="select"
+                  id={`tax-${index}`}
+                  value={invoice.items[index]?.taxes?.[0]?.taxRate || ""}
+                  onChange={(e) => handleTaxChange(e, index)}
+                >
+                  <option value="">
+                    {invoice.items[index]?.taxes?.[0]?.taxRate || ""}
+                  </option>
+                  {taxOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </Input>
               </FormGroup>
             </Col>
             <Col md={1}>
               <FormGroup>
-                <Label for={`quantity-${index}`}>Quantité</Label>
+                <Label for={`quantity-${index}`}>Qt</Label>
                 <Input
                   type="number"
                   name={`quantity-${index}`}
@@ -637,23 +728,31 @@ const EditInvoiceModal = ({
                   value={item.quantity}
                   onChange={(e) => {
                     const newItems = [...invoice.items];
-                    newItems[index].quantity = e.target.value;
-                    newItems[index].total =
-                      newItems[index].quantity * newItems[index].price;
-                    setInvoice({ ...invoice, items: newItems });
+                    const updatedQuantity = parseFloat(e.target.value);
+
+                    if (!isNaN(updatedQuantity)) {
+                      newItems[index].quantity = updatedQuantity;
+
+                      // Calculate base amount
+                      const baseAmount =
+                        updatedQuantity * parseFloat(newItems[index].price);
+
+                      if (!isNaN(baseAmount)) {
+                        const selectedTax = newItems[index].taxes?.[0];
+                        let taxAmount = 0;
+
+                        if (selectedTax) {
+                          taxAmount = baseAmount * (selectedTax.taxRate / 100);
+                        }
+
+                        newItems[index].total = baseAmount + taxAmount;
+                      } else {
+                        newItems[index].total = 0; // Set total to 0 if baseAmount is invalid
+                      }
+
+                      setInvoice({ ...invoice, items: newItems });
+                    }
                   }}
-                />
-              </FormGroup>
-            </Col>
-            <Col md={2}>
-              <FormGroup>
-                <Label for={`ref-${index}`}></Label>
-                <Input
-                  type="number"
-                  name={`ref-${index}`}
-                  id={`ref-${index}`}
-                  value={item.ref}
-                  readOnly
                 />
               </FormGroup>
             </Col>
@@ -671,34 +770,16 @@ const EditInvoiceModal = ({
             </Col>
             <Col md={2}>
               <Button color="danger" onClick={() => removeItem(index)}>
-                Supprimer
+                X
               </Button>
             </Col>
           </Row>
         ))}
+
         <Button color="primary" onClick={addItem}>
           Ajouter
         </Button>
         <Row form className="mt-3">
-          <Col md={6}>
-            <FormGroup>
-              <Label for="tax">Tax</Label>
-              <Input
-                type="select"
-                name="tax"
-                id="tax"
-                value={selectedTax ? selectedTax : ""} // Ensure selectedTax is correctly set
-                onChange={handleTaxChange}
-              >
-                <option value="">{getTaxevalue(selectedTax.value)}%</option>
-                {taxOptions.map((tax) => (
-                  <option key={tax.value} value={tax.value}>
-                    {tax.label}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
-          </Col>
           <Col md={6}>
             <FormGroup>
               <Label for="timbre">Timbre fiscal</Label>
@@ -714,9 +795,46 @@ const EditInvoiceModal = ({
         </Row>
         <Row>
           <Col md={6}>
-            <div>Total HT: {calculateSubtotal().toFixed(3)}</div>
-            <div>Tax:{taxAmount.toFixed(3)}</div>
-            <div>Timbre fiscal:{invoice.timbre.toFixed(3)}</div>
+            <div>
+              Total HT:
+              {(() => {
+                // Étape 1 : Calculer le total des taxes
+                const totalTax = invoice.items.reduce(
+                  (accumulatedTax, item) => {
+                    const itemTaxTotal = item.taxes.reduce(
+                      (sum, tax) => sum + (parseFloat(tax.taxAmount) || 0),
+                      0
+                    );
+                    return accumulatedTax + itemTaxTotal;
+                  },
+                  0
+                );
+
+                // Étape 2 : Soustraire le total des taxes du total de la facture
+                const invoiceTotalHT =
+                  (parseFloat(invoiceTotal) || 0) - totalTax;
+
+                console.log("Total Tax:", totalTax);
+                console.log("Invoice Total HT:", invoiceTotalHT);
+
+                // Retourner le total HT
+                return invoiceTotalHT.toFixed(3); // Arrondi à 2 décimales
+              })()}
+            </div>
+            <div>
+              Tax:{" "}
+              {(
+                invoice.items.reduce((totalTax, item) => {
+                  const itemTaxTotal = item.taxes.reduce(
+                    (sum, tax) => sum + tax.taxAmount,
+                    0
+                  );
+                  return totalTax + itemTaxTotal;
+                }, 0) + (parseFloat(invoice.timbre) || 0)
+              ).toFixed(3)}
+            </div>
+
+            <div>Timbre fiscal:{invoice.timbre}</div>
 
             <div>
               Total TTC:{" "}

@@ -2,21 +2,48 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faArrowDown,faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { Card, CardBody, Col, Container, Row, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, CardTitle, Spinner, Button, Badge, CardHeader, Progress, Table, CardFooter, Pagination, PaginationItem, PaginationLink, Input } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowUp,
+  faArrowDown,
+  faExclamationTriangle,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  Card,
+  CardBody,
+  Col,
+  Container,
+  Row,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  CardTitle,
+  Spinner,
+  Button,
+  Badge,
+  CardHeader,
+  Progress,
+  Table,
+  CardFooter,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+  Input,
+} from "reactstrap";
 
 const decodeToken = (token) => {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
   const payload = JSON.parse(atob(base64));
   return payload;
 };
 
 const Index = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const decodedToken = token ? decodeToken(token) : {};
   const currentUserId = decodedToken.AdminID;
+  console.log("token ===>", decodedToken.planExpiration);
 
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
   const [currencies, setCurrencies] = useState([]);
@@ -32,31 +59,60 @@ const Index = () => {
   const [payments, setPayments] = useState(false);
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [invoices, setInvoices] = useState([]);
   const [clients, setClients] = useState([]);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [invoicesPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [totalPaid, setTotalPaid] = useState(0);
   const [totalUnPaid, setTotalUnPaid] = useState(0);
+  const [daysRemaining, setDaysRemaining] = useState(0);
+
+  useEffect(() => {
+    const calculateRemainingDays = () => {
+      const expirationDate = new Date(decodedToken.planExpiration); // Parse expiration date
+      const currentDate = new Date(); // Get current date
+      const timeDifference = expirationDate - currentDate; // Difference in milliseconds
+      const daysLeft = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Convert ms to days
+      setDaysRemaining(daysLeft);
+    };
+
+    calculateRemainingDays();
+    const interval = setInterval(calculateRemainingDays, 1000 * 60 * 60 * 24); // Update every 24 hours
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [decodedToken.planExpiration]);
+
+  // Determine the button color based on the number of remaining days
+  let buttonColor = "success"; // Default color for active plan
+  if (daysRemaining <= 3) {
+    buttonColor = "danger"; // Red button when exactly 3 days left
+  } else if (daysRemaining <= 0) {
+    buttonColor = "danger"; // Red button when expired
+  }
   const navigate = useNavigate();
 
   const verifySession = async () => {
     const token = localStorage.getItem("token");
-   
-  
+
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/verifySession`,{}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/verifySession`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       console.log("Session verified:", response.data.message);
     } catch (error) {
-      const message = error.response?.data?.message || "Session expired. Please log in again.";
-      console.log(message)
+      const message =
+        error.response?.data?.message ||
+        "Session expired. Please log in again.";
+      console.log(message);
       logout(message);
     }
   };
@@ -67,25 +123,28 @@ const Index = () => {
   };
   const fetchClients = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/client`, {
-        params: { createdBy: currentUserId }
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/client`,
+        {
+          params: { createdBy: currentUserId },
+        }
+      );
       setClients(response.data);
       console.log(response.data);
     } catch (err) {
-      toast.error('Failed to fetch clients');
+      toast.error("Failed to fetch clients");
     }
   };
   const fetchCurrencies = async () => {
     try {
-      const currencyResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/currency`, {
-        params: { createdBy: currentUserId },
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const currencyResponse = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/currency`,
+        {
+          params: { createdBy: currentUserId },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setCurrencies(currencyResponse.data);
-
-
-
     } catch (error) {
       console.error("Error fetching currencies:", error);
     }
@@ -154,21 +213,15 @@ const Index = () => {
   //   }
   // };
 
-
-
   const filteredInvoices = invoices.filter((invoice) => {
     return (
-      (invoice?.type === 'Standard' || invoice?.isConverted === true) && invoice?.paymentStatus === "Paid"
+      (invoice?.type === "Standard" || invoice?.isConverted === true) &&
+      invoice?.paymentStatus === "Paid"
     );
   });
 
-
-
-
-
-
   const getCurrencyByInvoiceId = (id) => {
-    const invoice = filteredInvoices.find(invoice => invoice._id === id);
+    const invoice = filteredInvoices.find((invoice) => invoice._id === id);
     if (!invoice || !invoice.currency) {
       return null;
     }
@@ -176,19 +229,15 @@ const Index = () => {
     return invoice.currency._id;
   };
 
-
-
   const filteredStandardInvoices = invoices.filter((invoice) => {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
     const invoiceDate = new Date(invoice.date);
     return (
-
-      invoice?.type === 'Standard' && invoice?.currency?._id === selectedCurrency?._id
-      && invoiceDate.getMonth() + 1 === currentMonth &&
+      invoice?.type === "Standard" &&
+      invoice?.currency?._id === selectedCurrency?._id &&
+      invoiceDate.getMonth() + 1 === currentMonth &&
       invoiceDate.getFullYear() === currentYear
-
-
     );
   });
 
@@ -197,11 +246,10 @@ const Index = () => {
     const currentYear = new Date().getFullYear();
     const invoiceDate = new Date(invoice.date);
     return (
-
-      invoice?.type === 'Proforma' && invoice?.currency?._id === selectedCurrency?._id &&
+      invoice?.type === "Proforma" &&
+      invoice?.currency?._id === selectedCurrency?._id &&
       invoiceDate.getMonth() + 1 === currentMonth &&
       invoiceDate.getFullYear() === currentYear
-
     );
   });
   const filteredInvoicesByStatus = (status) => {
@@ -211,7 +259,7 @@ const Index = () => {
     return invoices.filter((invoice) => {
       const invoiceDate = new Date(invoice.date);
       return (
-        invoice?.type === 'Standard' &&
+        invoice?.type === "Standard" &&
         invoice?.status === status &&
         invoiceDate.getMonth() + 1 === currentMonth &&
         invoiceDate.getFullYear() === currentYear &&
@@ -226,7 +274,7 @@ const Index = () => {
     return invoices.filter((invoice) => {
       const invoiceDate = new Date(invoice.date);
       return (
-        invoice?.type === 'Proforma' &&
+        invoice?.type === "Proforma" &&
         invoice?.status === status &&
         invoiceDate.getMonth() + 1 === currentMonth &&
         invoiceDate.getFullYear() === currentYear &&
@@ -241,7 +289,7 @@ const Index = () => {
     return invoices.filter((invoice) => {
       const invoiceDate = new Date(invoice.date);
       return (
-        invoice?.type === 'Proforma' &&
+        invoice?.type === "Proforma" &&
         invoice?.status === status &&
         invoiceDate.getMonth() + 1 === currentMonth &&
         invoiceDate.getFullYear() === currentYear &&
@@ -255,7 +303,7 @@ const Index = () => {
     return invoices.filter((invoice) => {
       const invoiceDate = new Date(invoice.date);
       return (
-        invoice?.type === 'Standard' &&
+        invoice?.type === "Standard" &&
         invoice?.paymentStatus === status &&
         invoiceDate.getMonth() + 1 === currentMonth &&
         invoiceDate.getFullYear() === currentYear &&
@@ -270,7 +318,7 @@ const Index = () => {
     return invoices.filter((invoice) => {
       const invoiceDate = new Date(invoice.date);
       return (
-        invoice?.type === 'Proforma' &&
+        invoice?.type === "Proforma" &&
         invoice?.paymentStatus === status &&
         invoiceDate.getMonth() + 1 === currentMonth &&
         invoiceDate.getFullYear() === currentYear &&
@@ -285,14 +333,11 @@ const Index = () => {
 
     const filteredInvoices = filteredProformaInvoicesByStatus(status);
 
-    const percentage = (filteredInvoices.length / filteredProformaInvoices.length) * 100;
+    const percentage =
+      (filteredInvoices.length / filteredProformaInvoices.length) * 100;
 
     return Math.round(percentage);
   };
-
-
-
-
 
   const Paymentstatuspercentage = (status) => {
     if (!selectedCurrency || filteredStandardInvoices.length === 0) {
@@ -301,7 +346,8 @@ const Index = () => {
 
     const filteredInvoices = filteredInvoicesByPaymentStatus(status);
 
-    const percentage = (filteredInvoices.length / filteredStandardInvoices.length) * 100;
+    const percentage =
+      (filteredInvoices.length / filteredStandardInvoices.length) * 100;
 
     return Math.round(percentage);
   };
@@ -313,7 +359,8 @@ const Index = () => {
 
     const filteredInvoices = filteredProformaInvoicesByPaymentStatus(status);
 
-    const percentage = (filteredInvoices.length / filteredProformaInvoices.length) * 100;
+    const percentage =
+      (filteredInvoices.length / filteredProformaInvoices.length) * 100;
 
     return Math.round(percentage);
   };
@@ -325,7 +372,8 @@ const Index = () => {
 
     const filteredInvoices = filteredInvoicesByStatus(status);
 
-    const percentage = (filteredInvoices.length / filteredStandardInvoices.length) * 100;
+    const percentage =
+      (filteredInvoices.length / filteredStandardInvoices.length) * 100;
 
     return Math.round(percentage);
   };
@@ -337,20 +385,21 @@ const Index = () => {
 
     const filteredInvoices = ProformafilteredInvoicesByStatus(status);
 
-    const percentage = (filteredInvoices.length / filteredProformaInvoices.length) * 100;
+    const percentage =
+      (filteredInvoices.length / filteredProformaInvoices.length) * 100;
 
     return Math.round(percentage);
   };
 
-
-
   const fetchPayment = async () => {
     try {
-      const paymentResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/createdBy/${currentUserId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const paymentsThisMonth = paymentResponse.data.filter(payment => {
-
+      const paymentResponse = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/payments/createdBy/${currentUserId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const paymentsThisMonth = paymentResponse.data.filter((payment) => {
         const paymentDate = new Date(payment.paymentDate);
         return (
           paymentDate.getMonth() + 1 === currentMonth &&
@@ -360,7 +409,7 @@ const Index = () => {
       const paymentsByCurrency = paymentsThisMonth.reduce((acc, payment) => {
         const currencyId = selectedCurrency._id;
         const x = Draftstatuspercentage();
-        console.log(x)
+        console.log(x);
         if (!currencyId) {
           return acc;
         }
@@ -374,7 +423,7 @@ const Index = () => {
         return acc;
       }, {});
 
-      console.log('Payments by Currency:', paymentsByCurrency);
+      console.log("Payments by Currency:", paymentsByCurrency);
       setPayments(paymentsByCurrency);
     } catch (error) {
       console.error("Error fetching payments:", error);
@@ -382,54 +431,52 @@ const Index = () => {
   };
 
   const getClientNameById = (clientId) => {
-    const client = clients.find(client => client._id === clientId);
-    if (!client) return 'Client not found';
+    const client = clients.find((client) => client._id === clientId);
+    if (!client) return "Client not found";
 
-    if (client.type === 'Person' && client.person) {
+    if (client.type === "Person" && client.person) {
       return (
         <>
           {client.person.prenom} <br /> {client.person.nom}
         </>
       );
-    } else if (client.type === 'Company' && client.entreprise) {
+    } else if (client.type === "Company" && client.entreprise) {
       return client.entreprise.nom;
     } else {
-      return 'Client type not recognized';
+      return "Client type not recognized";
     }
   };
 
-
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Envoyé':
-        return 'success';
-      case 'Annulé':
-        return 'danger';
-      case 'Brouillon':
-        return 'light';
+      case "Envoyé":
+        return "success";
+      case "Annulé":
+        return "danger";
+      case "Brouillon":
+        return "light";
 
-      case 'Cancelled':
-        return 'danger';
+      case "Cancelled":
+        return "danger";
       default:
-        return 'light';
+        return "light";
     }
   };
 
   const getPaymentStatusStyle = (status) => {
     switch (status) {
-      case 'Paid':
-        return 'success';
-      case 'Unpaid':
-        return 'danger';
-      case 'Partially Paid':
-        return 'info';
-      case 'Retard':
-        return 'warning';
+      case "Paid":
+        return "success";
+      case "Unpaid":
+        return "danger";
+      case "Partially Paid":
+        return "info";
+      case "Retard":
+        return "warning";
       default:
-        return 'light';
+        return "light";
     }
   };
-
 
   const handleCurrencySelect = (currency) => {
     setSelectedCurrency(currency);
@@ -439,16 +486,17 @@ const Index = () => {
     const numericPrice = Number(price);
 
     if (isNaN(numericPrice)) {
-      return 'Invalid amount';
+      return "Invalid amount";
     }
 
-    const currency = currencies.find(c => c._id === id);
+    const currency = currencies.find((c) => c._id === id);
     if (!currency) return numericPrice.toFixed(3);
 
     return `${currency.symbol} ${numericPrice.toFixed(3)}`;
   };
 
-  const toggleCurrencyDropdown = () => setCurrencyDropdownOpen(!currencyDropdownOpen);
+  const toggleCurrencyDropdown = () =>
+    setCurrencyDropdownOpen(!currencyDropdownOpen);
 
   useEffect(() => {
     verifySession();
@@ -458,21 +506,23 @@ const Index = () => {
     fetchPayment();
   }, [selectedCurrency, startDate, endDate]);
 
-
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${currentUserId}`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/invoices/${currentUserId}`
+      );
 
       // Check total number of invoices fetched
       console.log(`Total Invoices: ${response.data.length}`);
 
-      const filteredInvoices = response.data.filter(invoice => {
+      const filteredInvoices = response.data.filter((invoice) => {
         const invoiceDate = new Date(invoice.date);
         const start = new Date(startDate);
         const end = new Date(endDate);
 
         // Check if the currency matches the selected currency
-        const currencyMatches = invoice?.currency?._id === selectedCurrency?._id;
+        const currencyMatches =
+          invoice?.currency?._id === selectedCurrency?._id;
 
         // Check if both startDate and endDate are selected
         const dateInRange =
@@ -484,7 +534,9 @@ const Index = () => {
       });
 
       // Sort invoices by date (newest first)
-      const sortedInvoices = filteredInvoices.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const sortedInvoices = filteredInvoices.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
 
       setInvoices(sortedInvoices);
       setTotalPaid(calculateTotalPaid(sortedInvoices));
@@ -496,60 +548,63 @@ const Index = () => {
   };
   const calculateTotalPaid = (invoices) => {
     return invoices
-      .filter(invoice => invoice.type === "Standard")
+      .filter((invoice) => invoice.type === "Standard")
       .reduce((sum, invoice) => sum + invoice.total, 0);
   };
 
   const calculateTotalUnPaid = (invoices) => {
     return invoices
-      .filter(invoice => invoice.type === "Proforma")
+      .filter((invoice) => invoice.type === "Proforma")
       .reduce((sum, invoice) => sum + invoice.total, 0);
   };
 
-
   const filterinvoices = invoices.filter((invoice) => {
-    const isPersonClient = invoice?.client?.type === 'Person'; // Check if the client type is 'Person'
-    const isCompanyClient = invoice?.client?.type === 'Company'; // Check if the client type is 'Company'
+    const isPersonClient = invoice?.client?.type === "Person"; // Check if the client type is 'Person'
+    const isCompanyClient = invoice?.client?.type === "Company"; // Check if the client type is 'Company'
 
     return (
-
-      (
-        (isPersonClient && invoice?.client?.person.prenom?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
-        (isPersonClient && invoice?.client?.person.nom?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
-
-        (isCompanyClient && invoice?.client?.name?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Company type, check if name starts with search query
-        invoice?.number?.toString().startsWith(searchQuery) // Check if invoice number starts with the search query
-      )
+      (isPersonClient &&
+        invoice?.client?.person.prenom
+          ?.toLowerCase()
+          .startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
+      (isPersonClient &&
+        invoice?.client?.person.nom
+          ?.toLowerCase()
+          .startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
+      (isCompanyClient &&
+        invoice?.client?.name
+          ?.toLowerCase()
+          .startsWith(searchQuery.toLowerCase())) || // For Company type, check if name starts with search query
+      invoice?.number?.toString().startsWith(searchQuery) // Check if invoice number starts with the search query
     );
   });
 
-
-
-
   const indexOfLastInvoice = currentPage * invoicesPerPage;
   const indexOfFirstInvoice = indexOfLastInvoice - invoicesPerPage;
-  const currentInvoices = filterinvoices.slice(indexOfFirstInvoice, indexOfLastInvoice);
+  const currentInvoices = filterinvoices.slice(
+    indexOfFirstInvoice,
+    indexOfLastInvoice
+  );
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-
   // Determine the badge color and icon based on the difference
   const difference = (totalPaid - totalUnPaid).toFixed(3);
-    
+
   let badgeColor, arrowIcon;
 
   if (difference > 0) {
-      badgeColor = 'success';
-      arrowIcon = faArrowUp;
+    badgeColor = "success";
+    arrowIcon = faArrowUp;
   } else if (difference < 0) {
-      badgeColor = 'danger';
-      arrowIcon = faArrowDown;
+    badgeColor = "danger";
+    arrowIcon = faArrowDown;
   } else {
-      badgeColor = 'warning'; // Warning for zero
-      arrowIcon = faExclamationTriangle; // Warning icon
+    badgeColor = "warning"; // Warning for zero
+    arrowIcon = faExclamationTriangle; // Warning icon
   }
   return (
     <>
@@ -565,25 +620,41 @@ const Index = () => {
                   {selectedCurrency ? selectedCurrency.name : "Select Devise"}
                 </DropdownToggle>
                 <DropdownMenu>
-                  {currencies.map(currency => (
-                    <DropdownItem key={currency._id} onClick={() => handleCurrencySelect(currency)}>
+                  {currencies.map((currency) => (
+                    <DropdownItem
+                      key={currency._id}
+                      onClick={() => handleCurrencySelect(currency)}
+                    >
                       {currency.name}
                     </DropdownItem>
                   ))}
                 </DropdownMenu>
               </Dropdown>
+              <Button
+                color={buttonColor}
+                disabled={daysRemaining <= 0}
+                style={{ width: "200px", textAlign: "center" }}
+              >
+                {daysRemaining > 0
+                  ? `Expire dans ${daysRemaining} jour${
+                      daysRemaining !== 1 ? "s" : ""
+                    }`
+                  : "Expiré"}
+              </Button>
             </Col>
           </Row>
           <div className="header-body">
             <Row>
               {/* Paid Invoices Card */}
               <Col lg="6" xl="4">
-
                 <Card className="card-stats mb-4 mb-xl-0">
                   <CardBody>
                     <Row>
                       <div className="col">
-                        <CardTitle tag="h5" className="text-uppercase text-muted mb-0">
+                        <CardTitle
+                          tag="h5"
+                          className="text-uppercase text-muted mb-0"
+                        >
                           Factures Ventes
                         </CardTitle>
                         <Badge color="success" style={{ fontSize: "20px" }}>
@@ -606,7 +677,10 @@ const Index = () => {
                   <CardBody>
                     <Row>
                       <div className="col">
-                        <CardTitle tag="h5" className="text-uppercase text-muted mb-0">
+                        <CardTitle
+                          tag="h5"
+                          className="text-uppercase text-muted mb-0"
+                        >
                           Factures Achats
                         </CardTitle>
                         <Badge color="danger" style={{ fontSize: "20px" }}>
@@ -628,17 +702,31 @@ const Index = () => {
                   <CardBody>
                     <Row>
                       <div className="col">
-                        <CardTitle tag="h5" className="text-uppercase text-muted mb-0">
+                        <CardTitle
+                          tag="h5"
+                          className="text-uppercase text-muted mb-0"
+                        >
                           Bénéfices
                         </CardTitle>
-                        <Badge color={badgeColor} style={{ fontSize: "20px", display: "flex", alignItems: "center" }}>
-                          <FontAwesomeIcon icon={arrowIcon} style={{ marginRight: "5px" }} />
+                        <Badge
+                          color={badgeColor}
+                          style={{
+                            fontSize: "20px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={arrowIcon}
+                            style={{ marginRight: "5px" }}
+                          />
                           {difference}
                         </Badge>
                       </div>
                       <Col className="col-auto">
                         <div className="icon icon-shape bg-warning text-white rounded-circle shadow">
-                        <i className="fa fa-chart-line"></i>                       </div>
+                          <i className="fa fa-chart-line"></i>{" "}
+                        </div>
                       </Col>
                     </Row>
                   </CardBody>
@@ -647,11 +735,8 @@ const Index = () => {
             </Row>
           </div>
         </Container>
-
       </div>
       <Container className="mt--7" fluid>
-
-
         <Row className="mt-5">
           <Col className="mb-5 mb-xl-0" xl="12">
             <Card className="shadow">
@@ -700,7 +785,6 @@ const Index = () => {
                     <th scope="col">Total </th>
                     <th scope="col">Status</th>
                     <th scope="col"></th>
-
                   </tr>
                 </thead>
                 <tbody>
@@ -711,27 +795,34 @@ const Index = () => {
                         <td>{getClientNameById(invoice.client._id)}</td>
                         <td>{new Date(invoice.date).toLocaleDateString()}</td>
 
-                        <td>
-                          {invoice.total}
-                        </td>
-
-
+                        <td>{invoice.total}</td>
 
                         <td>
-                          <Badge color={invoice.type === 'Proforma' ? 'warning' : 'success'}>
-                            {invoice.type === 'Proforma' ? 'Achats' : 'Ventes'}
+                          <Badge
+                            color={
+                              invoice.type === "Proforma"
+                                ? "warning"
+                                : "success"
+                            }
+                          >
+                            {invoice.type === "Proforma" ? "Achats" : "Ventes"}
                           </Badge>
                         </td>
-
-
-
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td colSpan="8">
-                        <div style={{ textAlign: 'center' }}>
-                          <i className="fa-solid fa-ban" style={{ display: 'block', marginBottom: '10px', fontSize: '50px', opacity: '0.5' }}></i>
+                        <div style={{ textAlign: "center" }}>
+                          <i
+                            className="fa-solid fa-ban"
+                            style={{
+                              display: "block",
+                              marginBottom: "10px",
+                              fontSize: "50px",
+                              opacity: "0.5",
+                            }}
+                          ></i>
                           No invoices found
                         </div>
                       </td>
@@ -742,9 +833,18 @@ const Index = () => {
               <CardFooter className="py-4">
                 <nav aria-label="...">
                   <Pagination className="pagination justify-content-end mb-0">
-                    {[...Array(Math.ceil(invoices.length / invoicesPerPage)).keys()].map((pageNumber) => (
-                      <PaginationItem key={pageNumber + 1} active={currentPage === pageNumber + 1}>
-                        <PaginationLink onClick={() => paginate(pageNumber + 1)}>
+                    {[
+                      ...Array(
+                        Math.ceil(invoices.length / invoicesPerPage)
+                      ).keys(),
+                    ].map((pageNumber) => (
+                      <PaginationItem
+                        key={pageNumber + 1}
+                        active={currentPage === pageNumber + 1}
+                      >
+                        <PaginationLink
+                          onClick={() => paginate(pageNumber + 1)}
+                        >
                           {pageNumber + 1}
                         </PaginationLink>
                       </PaginationItem>
@@ -752,10 +852,8 @@ const Index = () => {
                   </Pagination>
                 </nav>
               </CardFooter>
-
             </Card>
           </Col>
-
         </Row>
       </Container>
     </>

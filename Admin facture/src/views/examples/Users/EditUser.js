@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalHeader,
@@ -18,6 +18,20 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
     planExpirationDate: "", // Date d'expiration sélectionnée
   });
 
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    if (formData.planExpirationDate) {
+      const selectedDate = new Date(formData.planExpirationDate);
+      const today = new Date();
+      if (selectedDate < today) {
+        setIsExpired(true);
+      } else {
+        setIsExpired(false);
+      }
+    }
+  }, [formData.planExpirationDate]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -26,6 +40,12 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
   const handleSubmit = async () => {
     if (!formData.etat) {
       toast.error("Veuillez sélectionner un état.");
+      return;
+    }
+
+    // Ensure "active" cannot be selected if the plan has expired
+    if (formData.etat === "active" && isExpired) {
+      toast.error("Le plan est expiré. Vous ne pouvez pas activer cet utilisateur.");
       return;
     }
 
@@ -68,15 +88,18 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
             name="etat"
             value={formData.etat}
             onChange={handleChange}
+            disabled={isExpired && formData.etat === "active"} // Disable "active" if expired
           >
             <option value="">-- Sélectionnez un état --</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-            <option value="notActive">Not Active</option>
+            <option value="active" disabled={isExpired}>
+              Active
+            </option>
+            <option value="suspended">Suspendue</option>
+            <option value="notActive">Désactivé</option>
           </Input>
         </FormGroup>
         <FormGroup>
-          <Label for="planExpirationDate">Date d'expiration du plan</Label>
+          <Label for="planExpirationDate">Date d'expiration</Label>
           <Input
             type="date"
             id="planExpirationDate"

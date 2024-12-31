@@ -6,7 +6,6 @@ const itemSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
- 
   article: {
     type: String,
     required: true,
@@ -27,7 +26,25 @@ const itemSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  taxes: [
+    {
+      taxRate: {
+        type: Number,
+        required: true,  // Tax rate (e.g., 10 for 10%)
+      },
+      taxAmount: {
+        type: Number,
+        required: true,  // Amount of tax calculated based on the tax rate
+      },
+      taxName: {
+        type: String,
+        required: true,  
+      },
+      
+    },
+  ],
 });
+
 
 const invoiceSchema = new mongoose.Schema({
   client: {
@@ -43,7 +60,7 @@ const invoiceSchema = new mongoose.Schema({
   number: {
     type: Number,
     required: true,
-    unique : true,
+    unique: true,
   },
   year: {
     type: Number,
@@ -58,19 +75,19 @@ const invoiceSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Brouillon', 'Envoyé', 'Annulé','En attente','Accepté','Refusé'],
+    enum: ['Brouillon', 'Envoyé', 'Annulé', 'En attente', 'Accepté', 'Refusé'],
     default: 'Brouillon',
   },
   paymentStatus: {
     type: String,
     required: false,
-    enum: ['impayé', 'Partiellement payé', 'Payé','Retard'],
+    enum: ['impayé', 'Partiellement payé', 'Payé', 'Retard'],
     default: 'impayé',
   },
   type: {
     type: String,
     required: true,
-    enum: ['Standard', 'Proforma'],  // Standard for regular invoices, Proforma for proforma invoices
+    enum: ['Standard', 'Proforma'], // Standard for regular invoices, Proforma for proforma invoices
     default: 'Standard',
   },
   isConverted: {
@@ -92,15 +109,15 @@ const invoiceSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  tax: {
+  tax: [{
     type: mongoose.Schema.ObjectId,
     ref: 'Tax',
-    required: true,
     autopopulate: true,
-  },
+  }],
   taxAmount: {
     type: Number,
     required: true,
+    default: 0,
   },
   total: {
     type: Number,
@@ -118,10 +135,10 @@ const invoiceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  factureImage: { type: String } 
-  
-  
-},{ timestamps: true });
+  factureImage: {
+    type: String,
+  }
+}, { timestamps: true });
 
 invoiceSchema.plugin(require('mongoose-autopopulate'));
 

@@ -54,19 +54,21 @@ const Persons = () => {
         `${process.env.REACT_APP_API_URL}/superadmin/admins`
       );
       const updatedPeople = response.data.map((person) => {
-        // Compare planExpiration with the current date to update the etat
         const expirationDate = new Date(person.planExpiration);
         const currentDate = new Date();
-        
-        if (expirationDate < currentDate) {
-          // If the account is expired, set the etat to 'expired'
-          person.etat = "suspended";
+
+        if (expirationDate < currentDate && person.etat !== "suspended") {
+          axios.put(
+            `${process.env.REACT_APP_API_URL}/superadmin/admins/${person._id}`,
+            { etat: "suspended" }
+          );
+          person.etat = "suspended"; // Update state directly here for dynamic update
         }
 
         return person;
       });
 
-      setPeople(updatedPeople);
+      setPeople(updatedPeople); // Update the people state with the new list
     } catch (error) {
       console.error("Error fetching people:", error);
     }
@@ -149,85 +151,105 @@ const Persons = () => {
                   </thead>
                   <tbody>
                     {currentPeople.length > 0 ? (
-                      currentPeople.map((person) => (
-                        <tr key={person._id}>
-                          <td>{person.name}</td>
-                          <td>{person.surname}</td>
-                          <td>{person.email}</td>
-                          <td>
-                            {person.etat === "active" && (
-                              <>
-                              <FontAwesomeIcon
-                                icon={faCircle}
-                                style={{ color: "green", fontSize: "0.7rem" }}
-                              />
-                              Active
-                              </>
-                            )}
-                            {person.etat === "suspended" && (
-                              <>
-                              <FontAwesomeIcon
-                                icon={faCircle}
-                                style={{ color: "orange", fontSize: "0.7rem" }}
-                              />
-                              Suspendue
-                              </>
-                            )}
-                            {person.etat === "notActive" && (
-                              <>
-                              <FontAwesomeIcon
-                                icon={faCircle}
-                                style={{ color: "red", fontSize: "0.7rem" }}
-                              />
-                              Désactivé
-                              </>
-                            )}
-                            {person.etat === "expired" && (
-                              <FontAwesomeIcon
-                                icon={faCircle}
-                                style={{ color: "gray", fontSize: "0.7rem" }}
-                              />
-                            )}
-                          </td>
-                          <td>{person.planExpiration.split("T")[0]}</td>
-                          <td>
-                            <Dropdown
-                              isOpen={dropdownOpen === person._id}
-                              toggle={() => toggleDropdown(person._id)}
-                            >
-                              <DropdownToggle
-                                tag="span"
-                                data-toggle="dropdown"
-                                style={{ cursor: "pointer" }}
+                      currentPeople.map((person) => {
+                        // Calculate if the plan is expired
+                        const currentDate = new Date();
+                        const planExpirationDate = new Date(
+                          person.planExpiration
+                        );
+                        const isExpired = planExpirationDate < currentDate;
+
+                        return (
+                          <tr key={person._id}>
+                            <td>{person.name}</td>
+                            <td>{person.surname}</td>
+                            <td>{person.email}</td>
+                            <td>
+                              {/* Check if expired first */}
+                              {isExpired ? (
+                                <>
+                                  <FontAwesomeIcon
+                                    icon={faCircle}
+                                    style={{
+                                      color: "gray",
+                                      fontSize: "0.7rem",
+                                    }}
+                                  />
+                                  Expiré
+                                </>
+                              ) : person.etat === "notActive" ? ( // Check if notActive (disabled)
+                                <>
+                                  <FontAwesomeIcon
+                                    icon={faCircle}
+                                    style={{ color: "red", fontSize: "0.7rem" }}
+                                  />
+                                  Désactivé
+                                </>
+                              ) : person.etat === "suspended" ? ( // Check if suspended
+                                <>
+                                  <FontAwesomeIcon
+                                    icon={faCircle}
+                                    style={{
+                                      color: "orange",
+                                      fontSize: "0.7rem",
+                                    }}
+                                  />
+                                  Suspendue
+                                </>
+                              ) : person.etat === "active" ? ( // Check if active
+                                <>
+                                  <FontAwesomeIcon
+                                    icon={faCircle}
+                                    style={{
+                                      color: "green",
+                                      fontSize: "0.7rem",
+                                    }}
+                                  />
+                                  Active
+                                </>
+                              ) : null}
+                            </td>
+
+                            <td>{person.planExpiration.split("T")[0]}</td>
+                            <td>
+                              <Dropdown
+                                isOpen={dropdownOpen === person._id}
+                                toggle={() => toggleDropdown(person._id)}
                               >
-                                <FontAwesomeIcon
-                                  icon={faEllipsisH}
-                                  style={{ fontSize: "1rem" }}
-                                />
-                              </DropdownToggle>
-                              <DropdownMenu
-                                right
-                                style={{ marginTop: "-25px" }}
-                              >
-                                <DropdownItem
-                                  onClick={() => handleEditClick(person)}
+                                <DropdownToggle
+                                  tag="span"
+                                  data-toggle="dropdown"
+                                  style={{ cursor: "pointer" }}
                                 >
-                                  <span className="d-flex align-items-center">
-                                    <i
-                                      className="fa-solid fa-gear"
-                                      style={{
-                                        fontSize: "1rem",
-                                        marginRight: "10px",
-                                      }}
-                                    ></i>
-                                    Modifier
-                                  </span>
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
-                          </td>
-                        </tr>
-                      ))
+                                  <FontAwesomeIcon
+                                    icon={faEllipsisH}
+                                    style={{ fontSize: "1rem" }}
+                                  />
+                                </DropdownToggle>
+                                <DropdownMenu
+                                  right
+                                  style={{ marginTop: "-25px" }}
+                                >
+                                  <DropdownItem
+                                    onClick={() => handleEditClick(person)}
+                                  >
+                                    <span className="d-flex align-items-center">
+                                      <i
+                                        className="fa-solid fa-gear"
+                                        style={{
+                                          fontSize: "1rem",
+                                          marginRight: "10px",
+                                        }}
+                                      ></i>
+                                      Modifier
+                                    </span>
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </Dropdown>
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
                         <td colSpan="6">

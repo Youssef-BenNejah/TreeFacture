@@ -8,47 +8,95 @@ const archiver = require("archiver");
 const mongoose = require("mongoose");
 const { DiffieHellmanGroup } = require("crypto");
 const multer = require("multer");
-const num2words = require('num2words');
-const numberToWords = require('number-to-words');
+const num2words = require("num2words");
+const numberToWords = require("number-to-words");
+
+function groupTaxesByName(invoice) {
+  const groupedTaxes = {};
+
+  invoice.items.forEach((item) => {
+    item.taxes.forEach((tax) => {
+      if (!groupedTaxes[tax.taxName]) {
+        groupedTaxes[tax.taxName] = {
+          taxName: tax.taxName,
+          taxRate: tax.taxRate,
+          totalTaxAmount: 0,
+        };
+      }
+      groupedTaxes[tax.taxName].totalTaxAmount += tax.taxAmount;
+    });
+  });
+
+  return Object.values(groupedTaxes);
+}
 
 function convertToFrenchText(number) {
   const units = [
-      "", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"
+    "",
+    "un",
+    "deux",
+    "trois",
+    "quatre",
+    "cinq",
+    "six",
+    "sept",
+    "huit",
+    "neuf",
   ];
   const teens = [
-      "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize"
+    "dix",
+    "onze",
+    "douze",
+    "treize",
+    "quatorze",
+    "quinze",
+    "seize",
   ];
   const tens = [
-      "", "", "vingt", "trente", "quarante", "cinquante", "soixante",
-      "soixante-dix", "quatre-vingts", "quatre-vingt-dix"
+    "",
+    "",
+    "vingt",
+    "trente",
+    "quarante",
+    "cinquante",
+    "soixante",
+    "soixante-dix",
+    "quatre-vingts",
+    "quatre-vingt-dix",
   ];
   const thousands = ["", "mille", "millions", "milliards"];
 
   if (number < 10) return units[number];
   if (number < 20) return teens[number - 10];
   if (number < 100) {
-      const tenPart = Math.floor(number / 10);
-      const unitPart = number % 10;
-      return (tens[tenPart] + (unitPart > 0 ? " " + units[unitPart] : "")).trim();
+    const tenPart = Math.floor(number / 10);
+    const unitPart = number % 10;
+    return (tens[tenPart] + (unitPart > 0 ? " " + units[unitPart] : "")).trim();
   }
   if (number < 1000) {
-      const hundredPart = Math.floor(number / 100);
-      const rest = number % 100;
-      return (hundredPart > 1 ? units[hundredPart] + " cents " : " cent ") + (rest > 0 ? " " + convertToFrenchText(rest) : "").trim();
+    const hundredPart = Math.floor(number / 100);
+    const rest = number % 100;
+    return (
+      (hundredPart > 1 ? units[hundredPart] + " cents " : " cent ") +
+      (rest > 0 ? " " + convertToFrenchText(rest) : "").trim()
+    );
   }
 
   let result = "";
   let thousandIndex = 0;
 
   while (number > 0) {
-      const part = number % 1000;
-      if (part > 0) {
-          const prefix = convertToFrenchText(part).trim();
-          const thousandPart = thousands[thousandIndex];
-          result = prefix + (thousandPart ? " " + thousandPart : "") + (result ? " " + result : "");
-      }
-      number = Math.floor(number / 1000);
-      thousandIndex++;
+    const part = number % 1000;
+    if (part > 0) {
+      const prefix = convertToFrenchText(part).trim();
+      const thousandPart = thousands[thousandIndex];
+      result =
+        prefix +
+        (thousandPart ? " " + thousandPart : "") +
+        (result ? " " + result : "");
+    }
+    number = Math.floor(number / 1000);
+    thousandIndex++;
   }
 
   return result.trim();
@@ -62,9 +110,9 @@ function convertDecimalToFrenchText(decimal) {
 }
 
 function convertNumberToFrenchText(number, curr) {
-  const parts = number.toString().split('.');
+  const parts = number.toString().split(".");
   const integerPart = parseInt(parts[0]);
-  const decimalPart = parts[1] ? parts[1].padEnd(3, '0') : '000'; // Remplir avec des zéros pour avoir toujours 3 chiffres
+  const decimalPart = parts[1] ? parts[1].padEnd(3, "0") : "000"; // Remplir avec des zéros pour avoir toujours 3 chiffres
 
   let text = convertToFrenchText(integerPart) + " " + curr; // Afficher la partie entière et la monnaie
 
@@ -80,19 +128,17 @@ function convertNumberToFrenchText(number, curr) {
     console.log("Trimmed Currency:", curr.trim()); // Vérification de curr après trim
     console.log("Type of Currency:", typeof curr); // Type de curr
 
-    if (curr && curr.trim() === "Dinar") { 
-        console.log("Currency is Dinar."); // Debug: Confirmer que curr est Dinar
-        text += " et " + decimalText.trim() + " millimes"; // Ajouter "millimes"
+    if (curr && curr.trim() === "Dinar") {
+      console.log("Currency is Dinar."); // Debug: Confirmer que curr est Dinar
+      text += " et " + decimalText.trim() + " millimes"; // Ajouter "millimes"
     } else {
-        console.log("Currency is NOT Dinar."); // Debug: pour comprendre pourquoi else s'exécute
-        text += " et " + decimalText.trim(); // Ajouter la partie décimale
+      console.log("Currency is NOT Dinar."); // Debug: pour comprendre pourquoi else s'exécute
+      text += " et " + decimalText.trim(); // Ajouter la partie décimale
     }
-}
-
+  }
 
   return text.trim();
 }
-
 
 // Setup storage and filename for uploaded files
 const storage = multer.diskStorage({
@@ -157,6 +203,9 @@ exports.createInvoice = async (req, res) => {
         .json({ message: "Invoice number already exists for this year." });
     }
 
+    // Sanitize the tax field (ensure it's an array of valid ObjectIds or empty array)
+    const sanitizedTax = Array.isArray(tax) ? tax.filter((t) => t) : []; // Remove invalid tax IDs
+
     // Get facture image if uploaded
     let factureImagePath = null;
     if (req.file) {
@@ -175,7 +224,7 @@ exports.createInvoice = async (req, res) => {
       note,
       items,
       subtotal,
-      tax,
+      tax: sanitizedTax, // Use sanitized tax field
       taxAmount,
       total,
       paidAmount,
@@ -195,6 +244,7 @@ exports.createInvoice = async (req, res) => {
       .json({ message: "Error creating invoice", error: error.message });
   }
 };
+
 
 // Expose the upload middleware with route handler
 
@@ -234,7 +284,6 @@ exports.getInvoices = async (req, res) => {
     res.status(500).json({ message: "Error fetching invoices", error });
   }
 };
-
 
 // Get a single invoice by its ID
 exports.getInvoiceById = async (req, res) => {
@@ -437,16 +486,16 @@ exports.generateInvoicePDF = async (req, res) => {
       const imagePath = path.join(__dirname, "../", invoice.factureImage);
 
       // Set the custom file name for the download
-     // let customFileName = `invoice-${invoice.number}.pdf`;
+      // let customFileName = `invoice-${invoice.number}.pdf`;
 
       if (invoice.client.person != null) {
-        console.log()
+        console.log();
         customFileName = `facture-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
-        console.log(customFileName)
+        console.log(customFileName);
       } else if (invoice.client.entreprise != null) {
         customFileName = `facture-${invoice.client.entreprise.nom}-${invoice.number}.pdf`;
       }
-      console.log(customFileName)
+      console.log(customFileName);
       // Add the company logo
 
       // Check if the factureImage file exists
@@ -576,7 +625,6 @@ exports.generateInvoicePDF = async (req, res) => {
         .text(company.phone, 400, 50, { align: "right" })
         .text(company.matriculefisc, 400, 70, { align: "right" });
 
-
       // Add invoice title
       doc.fontSize(20).fillColor("#5F259F").text("Facture", 50, 160);
 
@@ -587,7 +635,7 @@ exports.generateInvoicePDF = async (req, res) => {
         .text(`Date : ${invoice.date.toLocaleDateString()}`, 50, 200)
         .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
         .moveDown();
-       
+
       if (invoice.client.person != null) {
         doc.text(
           `Client :  ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
@@ -650,18 +698,12 @@ exports.generateInvoicePDF = async (req, res) => {
           .text(item.ref, 50, yPosition)
           .text(item.article, 120, yPosition)
           .text(item.quantity, 140, yPosition, { align: "center" })
-          .text(
-            ` ${item.price.toFixed(3)} `,
-            300,
-            yPosition,
-            { align: "center" }
-          )
-          .text(
-            ` ${item.total.toFixed(3)} `,
-            450,
-            yPosition,
-            { align: "center" }
-          );
+          .text(` ${item.price.toFixed(3)} `, 300, yPosition, {
+            align: "center",
+          })
+          .text(` ${item.total.toFixed(3)} `, 450, yPosition, {
+            align: "center",
+          });
 
         yPosition += 20;
       });
@@ -678,26 +720,64 @@ exports.generateInvoicePDF = async (req, res) => {
 
       doc.text("Total HT :", 350, yPosition, { align: "left" });
       doc.text(
-        ` ${(invoice.subtotal).toFixed(3)} ${invoice.currency.symbol}`,
+        ` ${(invoice.subtotal-invoice.taxAmount-invoice.timbre).toFixed(3)} ${invoice.currency.symbol}`,
         450,
         yPosition,
         { align: "right" }
       );
-     
+
       // Tax
-      yPosition += 15; // Adjust yPosition to move down for the next line
+      // yPosition += 15; // Adjust yPosition to move down for the next line
+      // doc.text(
+      //   `Tax ${invoice.tax.name} (${invoice.tax.taxvalue}%) :`,
+      //   350,
+      //   yPosition,
+      //   { align: "left" }
+      // );
+      // doc.text(
+      //   ` ${invoice.taxAmount.toFixed(3)} ${invoice.currency.symbol}`,
+      //   450,
+      //   yPosition,
+      //   { align: "right" }
+      // );
+      const groupedTaxes = groupTaxesByName(invoice);
+
+      yPosition += 15;
+      let totalTaxes = 0; // Initialize totalTaxes to 0
+
+      groupedTaxes.forEach((tax) => {
+        totalTaxes += tax.totalTaxAmount;
+
+        doc.text(
+          `${tax.taxName} (${tax.taxRate}%): `,
+          350,
+          yPosition,{align : "left"}
+        );
+        doc.text(
+          ` ${tax.totalTaxAmount.toFixed(3)} ${
+            invoice.currency.symbol
+          }`,
+          450,
+          yPosition,{align : "right"}
+        );
+        yPosition += 15;
+      });
+
+      // Total des taxes
       doc.text(
-        `Tax ${invoice.tax.name} (${invoice.tax.taxvalue}%) :`,
+        `Total Taxes : 
+        `,
         350,
         yPosition,
         { align: "left" }
       );
       doc.text(
-        ` ${invoice.taxAmount.toFixed(3)} ${invoice.currency.symbol}`,
+        `${totalTaxes.toFixed(3)} ${invoice.currency.symbol}`,
         450,
         yPosition,
         { align: "right" }
       );
+
       yPosition += 15;
       doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
       doc.text(
@@ -716,17 +796,23 @@ exports.generateInvoicePDF = async (req, res) => {
         yPosition,
         { align: "right" }
       );
-      const text = convertNumberToFrenchText(invoice.total.toFixed(3),invoice.currency.name);
+      const text = convertNumberToFrenchText(
+        invoice.total.toFixed(3),
+        invoice.currency.name
+      );
 
       yPosition += 15;
-      doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {
-          align: 'left',
+      doc.text(
+        "la présente facture est arrêtée à la somme de " + text,
+        50,
+        yPosition,
+        {
+          align: "left",
           width: 800, // Ajoutez cette propriété pour limiter la largeur
-      });
-    
+        }
+      );
 
       // Add footer
-      
 
       // Finalize the PDF and end the stream
       doc.end();
@@ -786,7 +872,7 @@ const generatePDF = (invoice, company) => {
       .moveDown();
 
     // Add client information
-  
+
     if (invoice.client.person != null) {
       doc.text(
         ` Client : ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
@@ -794,7 +880,7 @@ const generatePDF = (invoice, company) => {
         220,
         { align: "right" }
       );
-     
+
       doc.text(
         `Cin : ${invoice.client.person.cin}`,
         200,
@@ -833,22 +919,20 @@ const generatePDF = (invoice, company) => {
       doc.text("Logo Placeholder", 50, 45, { width: 100 });
     }
 
-    
-
     // Add table headers
     doc
-        .moveDown()
-        .fillColor("#5F259F")
-        .fontSize(12)
+      .moveDown()
+      .fillColor("#5F259F")
+      .fontSize(12)
 
-        .text("Référence", 50, 290)
-        .text("Article", 120, 290)
-        .text("Quantité", 170, 290, { align: "center" })
-        .text("Prix unt", 290, 290, { align: "center" })
-        .text("Total", 400, 290, { align: "center" })
-        .moveTo(50, 305)
-        .lineTo(550, 305)
-        .stroke();
+      .text("Référence", 50, 290)
+      .text("Article", 120, 290)
+      .text("Quantité", 170, 290, { align: "center" })
+      .text("Prix unt", 290, 290, { align: "center" })
+      .text("Total", 400, 290, { align: "center" })
+      .moveTo(50, 305)
+      .lineTo(550, 305)
+      .stroke();
 
     // Add items
     let yPosition = 320;
@@ -859,18 +943,10 @@ const generatePDF = (invoice, company) => {
         .text(item.ref, 50, yPosition)
         .text(item.article, 120, yPosition)
         .text(item.quantity, 170, yPosition, { align: "center" })
-        .text(
-          ` ${item.price.toFixed(3)} `,
-          270,
-          yPosition,
-          { align: "center" }
-        )
-        .text(
-          ` ${item.total.toFixed(3)} `,
-          400,
-          yPosition,
-          { align: "center" }
-        );
+        .text(` ${item.price.toFixed(3)} `, 270, yPosition, { align: "center" })
+        .text(` ${item.total.toFixed(3)} `, 400, yPosition, {
+          align: "center",
+        });
 
       yPosition += 20;
     });
@@ -878,61 +954,93 @@ const generatePDF = (invoice, company) => {
     // Add subtotal, tax, and total
     doc.fontSize(10).fillColor("black");
 
-yPosition += 10; // Add some spacing before the line
-      doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke(); // Draw the line
+    yPosition += 10; // Add some spacing before the line
+    doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke(); // Draw the line
 
-      yPosition += 10; // Add some spacing after the line
+    yPosition += 10; // Add some spacing after the line
 
-      doc.text("Total HT :", 350, yPosition, { align: "left" });
-      doc.text(
-        ` ${invoice.subtotal.toFixed(3)} ${invoice.currency.symbol}`,
-        450,
-        yPosition,
-        { align: "right" }
-      );
+    doc.text("Total HT :", 350, yPosition, { align: "left" });
+    doc.text(
+      ` ${invoice.subtotal.toFixed(3)} ${invoice.currency.symbol}`,
+      450,
+      yPosition,
+      { align: "right" }
+    );
+
     
+    const groupedTaxes = groupTaxesByName(invoice);
 
     yPosition += 15;
+    let totalTaxes = 0; // Initialize totalTaxes to 0
+
+    groupedTaxes.forEach((tax) => {
+      totalTaxes += tax.totalTaxAmount;
+
+      doc.text(
+        `${tax.taxName} (${tax.taxRate}%): `,
+        350,
+        yPosition,{align : "left"}
+      );
+      doc.text(
+        ` ${tax.totalTaxAmount.toFixed(3)} ${
+          invoice.currency.symbol
+        }`,
+        450,
+        yPosition,{align : "right"}
+      );
+      yPosition += 15;
+    });
+
+    // Total des taxes
     doc.text(
-      `Tax ${invoice.tax.name} (${invoice.tax.taxvalue}%) :`,
+      `Total Taxes : 
+      `,
       350,
       yPosition,
       { align: "left" }
     );
     doc.text(
-      ` ${invoice.taxAmount.toFixed(3)} ${invoice.currency.symbol}`,
+      `${totalTaxes.toFixed(3)} ${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }
     );
-
     yPosition += 15;
     doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
-   doc.text(
-` ${invoice.timbre ? invoice.timbre.toFixed(3) : '0.000'} ${invoice.currency.symbol}`,
-450,
-yPosition,
-{ align: "right" }
-);
-yPosition += 15;
+    doc.text(
+      ` ${invoice.timbre ? invoice.timbre.toFixed(3) : "0.000"} ${
+        invoice.currency.symbol
+      }`,
+      450,
+      yPosition,
+      { align: "right" }
+    );
+    yPosition += 15;
 
     doc.text("Total TTC :", 350, yPosition, { align: "left" });
     doc.text(
-      ` ${(invoice.total).toFixed(3)} ${invoice.currency.symbol}`,
+      ` ${invoice.total.toFixed(3)} ${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }
     );
-    const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
+    const text = convertNumberToFrenchText(
+      invoice.total,
+      invoice.currency.name
+    );
 
     yPosition += 15;
-    doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {
-      align: 'left',
-      width: 800, // Ajoutez cette propriété pour limiter la largeur
-  });
+    doc.text(
+      "la présente facture est arrêtée à la somme de " + text,
+      50,
+      yPosition,
+      {
+        align: "left",
+        width: 800, // Ajoutez cette propriété pour limiter la largeur
+      }
+    );
 
     // Add footer
-    
 
     // Finalize the PDF and end the stream
     doc.end();
@@ -1000,7 +1108,7 @@ exports.generateMultipleInvoicesZip = async (req, res) => {
 
     // Create a zip archive
     const archive = archiver("zip", { zlib: { level: 9 } });
-    
+
     // Set the response headers for the zip file
     res.setHeader("Content-Disposition", "attachment; filename=factures.zip");
     res.setHeader("Content-Type", "application/zip");
@@ -1069,7 +1177,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     }
 
     // Define the file path where the PDF will be temporarily saved
-   // let pdfFileName = `invoice-${invoice.number}.pdf`;
+    // let pdfFileName = `invoice-${invoice.number}.pdf`;
     if (invoice.client.person != null) {
       pdfFileName = `invoice-${invoice.client.person.nom}-${invoice.client.person.prenom}-${invoice.number}.pdf`;
     } else if (invoice.client.entreprise != null) {
@@ -1086,7 +1194,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     if (company.logo !== null) {
       doc.image(company.logo, 20, 30, { width: 60 });
     } else {
-      doc.text('Logo Placeholder', 50, 45, { width: 100 });
+      doc.text("Logo Placeholder", 50, 45, { width: 100 });
     }
     doc.pipe(res);
 
@@ -1126,44 +1234,43 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
       .moveDown();
 
-      
-      if (invoice.client.person != null) {
-        doc.text(
-          ` Client : ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
-          200,
-          220,
-          { align: "right" }
-        );
-        doc.text(
-          `Cin : ${invoice.client.person.cin}`,
-          200,
-          240, // Adjust y-position to place CIN below the name
-          { align: "right" }
-        );
-        doc.text(
-          `Adresse : ${invoice.client.person.adresse}`,
-          200,
-          260, // Adjust y-position to place CIN below the name
-          { align: "right" }
-        );
-      }
-      if (invoice.client.entreprise != null) {
-        doc.text(`Client :  ${invoice.client.entreprise.nom}`, 200, 220, {
-          align: "right",
-        });
-        doc.text(
-          `Mf : ${invoice.client.entreprise.fisc}`,
-          200,
-          240, // Adjust y-position to place CIN below the name
-          { align: "right" }
-        );
-        doc.text(
-          `Adresse : ${invoice.client.entreprise.adresse}`,
-          200,
-          260, // Adjust y-position to place CIN below the name
-          { align: "right" }
-        );
-      }
+    if (invoice.client.person != null) {
+      doc.text(
+        ` Client : ${invoice.client.person.nom} ${invoice.client.person.prenom} `,
+        200,
+        220,
+        { align: "right" }
+      );
+      doc.text(
+        `Cin : ${invoice.client.person.cin}`,
+        200,
+        240, // Adjust y-position to place CIN below the name
+        { align: "right" }
+      );
+      doc.text(
+        `Adresse : ${invoice.client.person.adresse}`,
+        200,
+        260, // Adjust y-position to place CIN below the name
+        { align: "right" }
+      );
+    }
+    if (invoice.client.entreprise != null) {
+      doc.text(`Client :  ${invoice.client.entreprise.nom}`, 200, 220, {
+        align: "right",
+      });
+      doc.text(
+        `Mf : ${invoice.client.entreprise.fisc}`,
+        200,
+        240, // Adjust y-position to place CIN below the name
+        { align: "right" }
+      );
+      doc.text(
+        `Adresse : ${invoice.client.entreprise.adresse}`,
+        200,
+        260, // Adjust y-position to place CIN below the name
+        { align: "right" }
+      );
+    }
     // Add table headers
     doc
       .moveDown()
@@ -1189,18 +1296,8 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
 
         .text(item.article, 120, yPosition)
         .text(item.quantity, 140, yPosition, { align: "center" })
-        .text(
-          ` ${item.price.toFixed(3)}`,
-          300,
-          yPosition,
-          { align: "center" }
-        )
-        .text(
-          ` ${item.total.toFixed(3)}`,
-          400,
-          yPosition,
-          { align: "center" }
-        );
+        .text(` ${item.price.toFixed(3)}`, 300, yPosition, { align: "center" })
+        .text(` ${item.total.toFixed(3)}`, 400, yPosition, { align: "center" });
 
       yPosition += 20;
     });
@@ -1220,22 +1317,46 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       yPosition,
       { align: "right" }
     );
+    const groupedTaxes = groupTaxesByName(invoice);
 
-    // Tax
-    yPosition += 15; // Adjust yPosition to move down for the next line
+    yPosition += 15;
+    let totalTaxes = 0; // Initialize totalTaxes to 0
+
+    groupedTaxes.forEach((tax) => {
+      totalTaxes += tax.totalTaxAmount;
+
+      doc.text(
+        `${tax.taxName} (${tax.taxRate}%): `,
+        350,
+        yPosition,{align : "left"}
+      );
+      doc.text(
+        ` ${tax.totalTaxAmount.toFixed(3)} ${
+          invoice.currency.symbol
+        }`,
+        450,
+        yPosition,{align : "right"}
+      );
+      yPosition += 15;
+    });
+
+    // Total des taxes
     doc.text(
-      `Tax ${invoice.tax.name} (${invoice.tax.taxvalue}%) :`,
+      `Total Taxes : 
+      `,
       350,
       yPosition,
       { align: "left" }
     );
     doc.text(
-      ` ${invoice.taxAmount.toFixed(3)}${invoice.currency.symbol}`,
+      `${totalTaxes.toFixed(3)} ${invoice.currency.symbol}`,
       450,
       yPosition,
       { align: "right" }
     );
     yPosition += 15;
+
+    
     doc.text("Timbre fiscal :", 350, yPosition, { align: "left" });
     doc.text(
       ` ${invoice.timbre.toFixed(3)} ${invoice.currency.symbol}`,
@@ -1252,17 +1373,23 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       yPosition,
       { align: "right" }
     );
-    const text = convertNumberToFrenchText(invoice.total,invoice.currency.name);
+    const text = convertNumberToFrenchText(
+      invoice.total,
+      invoice.currency.name
+    );
 
     yPosition += 15;
-    doc.text("la présente facture est arrêtée à la somme de "+text, 50, yPosition, {
-      align: 'left',
-      width: 800, // Ajoutez cette propriété pour limiter la largeur
-  });
-
+    doc.text(
+      "la présente facture est arrêtée à la somme de " + text,
+      50,
+      yPosition,
+      {
+        align: "left",
+        width: 800, // Ajoutez cette propriété pour limiter la largeur
+      }
+    );
 
     // Add footer
-   
 
     // Finalize the PDF and save the file
     doc.end();
@@ -1273,8 +1400,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     fs.unlinkSync(pdfPath);
   } catch (error) {
     console.error("Error generating PDF and sending email:", error); // Log error
-    res
-      .status(500)
+    res.status(500);
   }
 };
 
@@ -1347,8 +1473,7 @@ async function sendInvoiceByEmail(invoice, pdfPath, companyName, res) {
     console.log('Invoice status updated to "Envoyé"');
 
     // Respond to the API call
-    return res
-      .status(200)
+    return res.status(200);
   } catch (error) {
     console.error("Error sending email:", error);
 
@@ -1357,7 +1482,6 @@ async function sendInvoiceByEmail(invoice, pdfPath, companyName, res) {
       console.error("SMTP response error code:", error.responseCode);
     }
 
-    return res
-      .status(500)
+    return res.status(500);
   }
 }

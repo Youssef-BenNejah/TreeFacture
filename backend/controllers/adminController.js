@@ -117,7 +117,7 @@ exports.login = async (req, res) => {
     }
     // Generate new JWT with 4-hour expiration
     const token = jwt.sign(
-      { AdminID: userData.id, email: userData.email, role: userData.role, name: userData.name, surname: userData.surname },
+      { AdminID: userData.id, email: userData.email, role: userData.role, name: userData.name, surname: userData.surname, planExpiration: userData.planExpiration },
       process.env.JWT_SECRET,
       { expiresIn: '4h' } // Token expires in 4 hours
     );

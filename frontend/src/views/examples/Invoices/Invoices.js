@@ -561,7 +561,7 @@ const Invoices = () => {
                                                     <td>{invoice.number}</td>
                                                     <td>{getClientNameById(invoice.client._id)}</td>
                                                     <td>{new Date(invoice.date).toLocaleDateString()}</td>
-                                                    <td>{invoice.total}</td>
+                                                    <td>{invoice.subtotal}</td>
                                                     <td>
                                                         <Badge color={getStatusStyle(invoice.status)}>
                                                             {invoice.status}

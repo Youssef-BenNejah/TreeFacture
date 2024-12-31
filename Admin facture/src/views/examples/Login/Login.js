@@ -41,7 +41,7 @@ const Login = () => {
       const token = response.data.token;
       localStorage.setItem("token", token);
       console.log("Login successful:", response.data);
-      navigate("/admin/index");
+      navigate("/admin/users");
     } catch (error) {
       if (error.response) {
         if (error.response.status === 400) {

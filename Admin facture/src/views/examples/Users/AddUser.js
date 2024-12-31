@@ -31,23 +31,32 @@ const AddUser = ({ isOpen, toggle, refreshPeople }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const newUser = { name, surname, email, password, etat, planExpiration };
-
+  
     try {
       // Send data to the backend API to add a new user
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, newUser);
-
+  
       if (response.status === 201) {
         refreshPeople(); // Call the refresh function to update the list of users
         toggle(); // Close the modal
-        toast.success("User added successfully!"); // Show success toast
+        // Show success toast with the generated email and password on separate lines
+        toast.success(
+          <>
+            User added successfully!<br />
+            Email: {email}<br />
+            Password: {password}
+          </>
+        );
       }
     } catch (error) {
       console.error("Error adding user:", error);
       toast.error("An error occurred while adding the user."); // Show error toast
     }
   };
+  
+  
 
   return (
     <Modal isOpen={isOpen} toggle={toggle} className="modal-right">
