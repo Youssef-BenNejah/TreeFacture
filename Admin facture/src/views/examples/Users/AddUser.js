@@ -110,8 +110,10 @@ const AddUser = ({ isOpen, toggle, refreshPeople }) => {
               onChange={(e) => setEtat(e.target.value)}
             >
               <option value="active">Active</option>
-              <option value="suspended">Suspended</option>
-              <option value="notActive">Not Active</option>
+              <option value="suspended">Suspendue</option>
+              <option value="notActive">Désactivé</option>
+              <option value="expired">éxpiré</option>
+
             </Input>
           </FormGroup>
           <FormGroup>

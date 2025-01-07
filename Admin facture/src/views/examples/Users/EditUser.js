@@ -96,6 +96,8 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
             </option>
             <option value="suspended">Suspendue</option>
             <option value="notActive">Désactivé</option>
+            <option value="expired">éxpiré</option>
+
           </Input>
         </FormGroup>
         <FormGroup>

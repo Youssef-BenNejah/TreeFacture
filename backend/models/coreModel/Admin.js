@@ -51,7 +51,7 @@ const adminSchema = new Schema({
   },
   etat: {
     type: String,
-    enum: ['active', 'suspended', 'notActive'], // Possible states
+    enum: ['active', 'suspended', 'notActive','expired'], // Possible states
     default: 'notActive', // Default is active
   },
   planExpiration: { 

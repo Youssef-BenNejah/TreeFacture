@@ -36,13 +36,13 @@ const currentUserId = decodedToken.AdminID;
 
 const isAuthenticated = !!currentUserId; 
 var routes = [
-  // {
-  //   path: "/index",
-  //   name: "Dashboard",
-  //   icon: "ni ni-tv-2 text-primary",
-  //   component: <Index />,
-  //   layout: "/admin",
-  // },
+  {
+    path: "/index",
+    name: "Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: <Index />,
+    layout: "/admin",
+  },
   {
     path: "/users",
     name: "Users",

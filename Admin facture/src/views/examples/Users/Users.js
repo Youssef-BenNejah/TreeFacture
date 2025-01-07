@@ -43,6 +43,8 @@ const Persons = () => {
   const [personToEdit, setPersonToEdit] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const token = localStorage.getItem("token");
   const decodedToken = token ? decodeToken(token) : {};
@@ -53,26 +55,38 @@ const Persons = () => {
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/superadmin/admins`
       );
+  
       const updatedPeople = response.data.map((person) => {
         const expirationDate = new Date(person.planExpiration);
         const currentDate = new Date();
-
+  
         if (expirationDate < currentDate && person.etat !== "suspended") {
           axios.put(
             `${process.env.REACT_APP_API_URL}/superadmin/admins/${person._id}`,
-            { etat: "suspended" }
+            { etat: "expired" }
           );
-          person.etat = "suspended"; // Update state directly here for dynamic update
+          person.etat = "expired"; // Update state directly here for dynamic update
         }
-
+  
         return person;
       });
+  
+      // Sort by 'created' field in descending order (most recent first)
+      const sortedPeople = updatedPeople.sort((a, b) => {
+        const dateA = new Date(a.created).getTime(); // Get the precise timestamp
+        const dateB = new Date(b.created).getTime(); // Get the precise timestamp
+     
 
-      setPeople(updatedPeople); // Update the people state with the new list
+        return dateB - dateA; // Descending order based on timestamp
+      });
+  
+      setPeople(sortedPeople); // Update the people state with the sorted list
+      console.log(sortedPeople)
     } catch (error) {
       console.error("Error fetching people:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchPeople();
@@ -82,13 +96,35 @@ const Persons = () => {
     fetchPeople();
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+// Filter logic for search and date range
+const filteredPeople = people.filter((person) => {
+  const query = searchQuery.toLowerCase();
+  const personCreatedDate = new Date(person.created);
+  const start = startDate ? new Date(startDate) : null;
+  const end = endDate ? new Date(endDate) : null;
 
-  const indexOfLastPerson = currentPage * peoplePerPage;
-  const indexOfFirstPerson = indexOfLastPerson - peoplePerPage;
-  const currentPeople = people.slice(indexOfFirstPerson, indexOfLastPerson);
+  // Apply search filter
+  const matchesSearch =
+    person.name?.toLowerCase().includes(query) ||
+    person.surname?.toLowerCase().includes(query) ||
+    person.email?.toLowerCase().includes(query) ||
+    person.etat?.toLowerCase().includes(query);
+
+  // Apply date filter
+  const withinDateRange =
+    (!start || personCreatedDate >= start) &&
+    (!end || personCreatedDate <= end);
+
+  return matchesSearch && withinDateRange;
+});
+
+// Pagination logic
+const indexOfLastPerson = currentPage * peoplePerPage;
+const indexOfFirstPerson = indexOfLastPerson - peoplePerPage;
+const currentPeople = filteredPeople.slice(indexOfFirstPerson, indexOfLastPerson);
+
+const totalPages = Math.ceil(filteredPeople.length / peoplePerPage);
+
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -109,6 +145,14 @@ const Persons = () => {
     setPersonToEdit(person);
     toggleEditModal();
   };
+  
+// Handle search input change
+const handleSearchChange = (e) => setSearchQuery(e.target.value);
+
+// Handle date range changes
+const handleStartDateChange = (e) => setStartDate(e.target.value);
+const handleEndDateChange = (e) => setEndDate(e.target.value);
+
 
   return (
     <>
@@ -128,6 +172,20 @@ const Persons = () => {
                     onChange={handleSearchChange}
                     className="mr-3"
                   />
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={handleStartDateChange}
+                    className="mr-3"
+                    placeholder="Start Date"
+                  />
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={handleEndDateChange}
+                    className="mr-3"
+                    placeholder="End Date"
+                  />
                   <Button
                     color="primary"
                     style={{ width: buttonWidth }}
@@ -145,6 +203,8 @@ const Persons = () => {
                       <th scope="col">Prénom</th>
                       <th scope="col">Email</th>
                       <th scope="col">Etat</th>
+                      <th scope="col">Date début</th>
+
                       <th scope="col">Date d'expriration</th>
                       <th scope="col"></th>
                     </tr>
@@ -164,9 +224,10 @@ const Persons = () => {
                             <td>{person.name}</td>
                             <td>{person.surname}</td>
                             <td>{person.email}</td>
+
                             <td>
                               {/* Check if expired first */}
-                              {isExpired ? (
+                              {person.etat === "expired" ? (
                                 <>
                                   <FontAwesomeIcon
                                     icon={faCircle}
@@ -209,6 +270,7 @@ const Persons = () => {
                                 </>
                               ) : null}
                             </td>
+                            <td>{person.created.split("T")[0]}</td>
 
                             <td>{person.planExpiration.split("T")[0]}</td>
                             <td>
@@ -275,41 +337,24 @@ const Persons = () => {
               </div>
 
               <CardFooter className="py-4">
-                <nav aria-label="Page navigation example">
-                  <Pagination
-                    className="pagination justify-content-end mb-0"
-                    listClassName="justify-content-end mb-0"
-                  >
-                    <PaginationItem disabled={currentPage === 1}>
-                      <PaginationLink
-                        onClick={() => paginate(currentPage - 1)}
-                        tabIndex="-1"
+                <nav aria-label="...">
+                  <Pagination className="pagination justify-content-end mb-0">
+                    {[
+                      ...Array(
+                        Math.ceil(filteredPeople.length / peoplePerPage)
+                      ).keys(),
+                    ].map((pageNumber) => (
+                      <PaginationItem
+                        key={pageNumber + 1}
+                        active={currentPage === pageNumber + 1}
                       >
-                        <i className="fas fa-angle-left" />
-                        <span className="sr-only">Previous</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    {Array.from(
-                      { length: Math.ceil(people.length / peoplePerPage) },
-                      (_, index) => (
-                        <PaginationItem
-                          key={index + 1}
-                          active={index + 1 === currentPage}
+                        <PaginationLink
+                          onClick={() => paginate(pageNumber + 1)}
                         >
-                          <PaginationLink onClick={() => paginate(index + 1)}>
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    )}
-                    <PaginationItem
-                      disabled={currentPage === Math.ceil(people.length / peoplePerPage)}
-                    >
-                      <PaginationLink onClick={() => paginate(currentPage + 1)}>
-                        <i className="fas fa-angle-right" />
-                        <span className="sr-only">Next</span>
-                      </PaginationLink>
-                    </PaginationItem>
+                          {pageNumber + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
                   </Pagination>
                 </nav>
               </CardFooter>
