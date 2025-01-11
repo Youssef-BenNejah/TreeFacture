@@ -75,8 +75,8 @@ const invoiceSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Brouillon', 'Envoyé', 'Annulé', 'En attente', 'Accepté', 'Refusé'],
-    default: 'Brouillon',
+    enum: ['Facture', 'Devis', 'Bon de livraison'],
+    default: 'Facture',
   },
   paymentStatus: {
     type: String,

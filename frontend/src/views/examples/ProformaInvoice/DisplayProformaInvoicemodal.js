@@ -12,23 +12,19 @@ const DisplayProformaInvoiceModal = ({ isOpen, toggle, proformaInvoice, refreshI
 
     const getBadgeColor = (status) => {
         switch (status) {
-            case 'Brouillon':
-                return 'light';
-            case 'Envoyé':
-                return 'info';
-            case 'Annulé':
-                return 'warning';
-            case 'En attente':
-                return 'warning';
-            case 'Accepté':
-                return 'success';
-            case 'Refusé':
-                return 'danger';
-            default:
-                return 'light';
+          case "Facture":
+            return "success";
+    
+          case "Bon de livraison":
+            return "light";
+          case "Devis":
+            return "danger";
+    
+          default:
+            return "light";
         }
-    };
-
+      };
+    
     const handleDownloadPDF = async () => {
         
         console.log('Downloading PDF for invoice:', invoice);

@@ -317,15 +317,14 @@ const Invoices = () => {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Envoyé':
+            case 'Facture':
                 return 'success';
-            case 'Annulé':
+            case 'Devis':
                 return 'danger';
-            case 'Brouillon':
+            case 'Bon de livraison':
                 return 'light';
 
-            case 'Cancelled':
-                return 'danger';
+           
             default:
                 return 'light';
         }

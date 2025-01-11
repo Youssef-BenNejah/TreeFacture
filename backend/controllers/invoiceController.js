@@ -626,7 +626,7 @@ exports.generateInvoicePDF = async (req, res) => {
         .text(company.matriculefisc, 400, 70, { align: "right" });
 
       // Add invoice title
-      doc.fontSize(20).fillColor("#5F259F").text("Facture", 50, 160);
+      doc.fontSize(20).fillColor("#5F259F").text(invoice.status, 50, 160);
 
       // Add invoice details
       doc
@@ -861,7 +861,7 @@ const generatePDF = (invoice, company) => {
       .text(company.matriculefisc, 400, 70, { align: "right" });
 
     // Add invoice title
-    doc.fontSize(20).fillColor("#5F259F").text("Facture", 50, 160);
+    doc.fontSize(20).fillColor("#5F259F").text(invoice.status, 50, 160);
 
     // Add invoice details
     doc
@@ -1224,7 +1224,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       .text(company.matriculefisc, 400, 70, { align: "right" });
 
     // Add invoice title
-    doc.fontSize(20).fillColor("#5F259F").text("Facture", 50, 160);
+    doc.fontSize(20).fillColor("#5F259F").text(invoice.status, 50, 160);
 
     // Add invoice details
     doc
@@ -1468,7 +1468,7 @@ async function sendInvoiceByEmail(invoice, pdfPath, companyName, res) {
     console.log(`Email sent successfully: ${info.response}`);
 
     // Update invoice status to "Envoyé"
-    invoice.status = "Envoyé";
+    
     await invoice.save();
     console.log('Invoice status updated to "Envoyé"');
 

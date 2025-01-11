@@ -20,7 +20,7 @@ const AddInvoiceModal = ({ isOpen, toggle, refreshInvoices, userId }) => {
     number: 1,
     year: new Date().getFullYear(),
     currency: "",
-    status: "Brouillon",
+    status: "Facture",
     date: new Date().toISOString().substring(0, 10),
     note: "",
     items: [
@@ -274,7 +274,7 @@ const AddInvoiceModal = ({ isOpen, toggle, refreshInvoices, userId }) => {
         number: 1,
         year: new Date().getFullYear(),
         currency: "",
-        status: "Brouillon",
+        status: "Facture",
         date: new Date().toISOString().substring(0, 10),
         note: "",
         items: [
@@ -433,9 +433,9 @@ const AddInvoiceModal = ({ isOpen, toggle, refreshInvoices, userId }) => {
                 value={invoice.status}
                 onChange={handleInputChange}
               >
-                <option value="Brouillon">Brouillon</option>
-                <option value="Envoyé">Envoyé</option>
-                <option value="Annulé">Annulé</option>
+                <option value="Facture">Facture</option>
+                <option value="Devis">Devis</option>
+                <option value="Bon de livraison">Bon de livraison</option>
               </Input>
             </FormGroup>
           </Col>

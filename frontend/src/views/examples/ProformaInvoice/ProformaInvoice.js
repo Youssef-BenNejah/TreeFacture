@@ -273,22 +273,19 @@ const ProformaInvoice = () => {
     };
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Brouillon':
-                return 'light';
-            case 'Envoyé':
-                return 'info';
-            case 'Annulé':
-                return 'warning';
-            case 'En attente':
-                return 'warning';
-            case 'Accepté':
+            case 'Facture':
                 return 'success';
-            case 'Refusé':
+            case 'Devis':
                 return 'danger';
+            case 'Bon de livraison':
+                return 'light';
+
+           
             default:
                 return 'light';
         }
     };
+
     const getCurrencySymbolById = (id, price) => {
         const currency = currencies.find(currency => currency._id === id);
 

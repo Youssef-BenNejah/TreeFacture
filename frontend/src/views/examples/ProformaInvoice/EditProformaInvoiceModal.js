@@ -26,7 +26,7 @@ const EditProformaInvoiceModal = ({
     number: 1,
     year: new Date().getFullYear(),
     currency: "",
-    status: "Brouillon",
+    status: "Facture",
     date: new Date().toISOString().substring(0, 10),
     note: "",
     items: [
@@ -55,7 +55,7 @@ const EditProformaInvoiceModal = ({
   const [invoiceTotal, setInvoiceTotal] = useState(0);
   const [clientOptions, setClientOptions] = useState([]);
   const [currencyOptions, setCurrencyOptions] = useState([]);
-  const [statusOptions] = useState(["Brouillon", "Envoyé", "Annulé"]);
+  const [statusOptions] = useState(["Facture", "Devis", "Bon de livraison"]);
   const [productOptions, setProductOptions] = useState([]);
   const [factureImage, setFactureImage] = useState(null);
 

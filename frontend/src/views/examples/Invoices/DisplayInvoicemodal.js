@@ -11,12 +11,12 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice, refreshInvoices }) => {
   const [loading, setLoading] = useState(false);
   const getBadgeColor = (status) => {
     switch (status) {
-      case "Envoyé":
+      case "Facture":
         return "success";
 
-      case "Brouillon":
+      case "Bon de livraison":
         return "light";
-      case "Annulé":
+      case "Devis":
         return "danger";
 
       default:
@@ -83,18 +83,7 @@ const DisplayInvoiceModal = ({ isOpen, toggle, invoice, refreshInvoices }) => {
       );
 
       if (response.status === 200) {
-        await axios.put(
-          `${process.env.REACT_APP_API_URL}/api/invoices/invoices/${invoice._id}`,
-          {
-            status: "Envoyé",
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
+        
         toast.success("Invoice sent via email successfully.");
         refreshInvoices();
       } else {
