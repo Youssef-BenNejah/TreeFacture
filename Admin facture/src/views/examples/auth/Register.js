@@ -141,8 +141,8 @@ const Register = () => {
             </Link>
           </Col> */}
 
-          <Col className="text-right" xs="6">
-            <Link className="text-light" to="/auth/register">
+<Col className="text-right" xs="4">
+            <Link className="text-light" to="/auth/login">
               <small>Se connecter</small>
             </Link>
           </Col>
