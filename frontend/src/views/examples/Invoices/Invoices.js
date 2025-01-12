@@ -259,6 +259,8 @@ const Invoices = () => {
             (
                 (isPersonClient && invoice?.client?.person.prenom?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
                 (isPersonClient && invoice?.client?.person.nom?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
+                (invoice?.status?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Person type, check if name starts with search query
+
 
                 (isCompanyClient && invoice?.client?.name?.toLowerCase().startsWith(searchQuery.toLowerCase())) || // For Company type, check if name starts with search query
                 invoice?.number?.toString().startsWith(searchQuery) // Check if invoice number starts with the search query

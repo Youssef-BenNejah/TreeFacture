@@ -104,11 +104,11 @@ exports.login = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Incorrect email or password' });
     }
-    if (userData.etat === 'suspended') {
+    if (userData.etat === 'Suspendue') {
       return res.status(403).json({ message: 'Your account is suspended. Please contact support.' });
     }
 
-    if (userData.etat === 'notActive') {
+    if (userData.etat === 'Désactivé') {
       return res.status(406).json({ message: 'Your account is not active. Please contact support.' });
     }
     const currentDate = new Date();

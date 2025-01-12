@@ -63,9 +63,9 @@ const Persons = () => {
         if (expirationDate < currentDate && person.etat !== "suspended") {
           axios.put(
             `${process.env.REACT_APP_API_URL}/superadmin/admins/${person._id}`,
-            { etat: "expired" }
+            { etat: "expiré" }
           );
-          person.etat = "expired"; // Update state directly here for dynamic update
+          person.etat = "expiré"; // Update state directly here for dynamic update
         }
   
         return person;
@@ -105,10 +105,11 @@ const filteredPeople = people.filter((person) => {
 
   // Apply search filter
   const matchesSearch =
-    person.name?.toLowerCase().includes(query) ||
-    person.surname?.toLowerCase().includes(query) ||
-    person.email?.toLowerCase().includes(query) ||
-    person.etat?.toLowerCase().includes(query);
+  person.name?.toLowerCase().startsWith(query) ||
+  person.surname?.toLowerCase().startsWith(query) ||
+  person.email?.toLowerCase().startsWith(query) ||
+  person.etat?.toLowerCase().startsWith(query);
+console.log(person)
 
   // Apply date filter
   const withinDateRange =
@@ -227,7 +228,7 @@ const handleEndDateChange = (e) => setEndDate(e.target.value);
 
                             <td>
                               {/* Check if expired first */}
-                              {person.etat === "expired" ? (
+                              {person.etat === "expiré" ? (
                                 <>
                                   <FontAwesomeIcon
                                     icon={faCircle}
@@ -238,7 +239,7 @@ const handleEndDateChange = (e) => setEndDate(e.target.value);
                                   />
                                   Expiré
                                 </>
-                              ) : person.etat === "notActive" ? ( // Check if notActive (disabled)
+                              ) : person.etat === "Désactivé" ? ( // Check if notActive (disabled)
                                 <>
                                   <FontAwesomeIcon
                                     icon={faCircle}
@@ -246,7 +247,7 @@ const handleEndDateChange = (e) => setEndDate(e.target.value);
                                   />
                                   Désactivé
                                 </>
-                              ) : person.etat === "suspended" ? ( // Check if suspended
+                              ) : person.etat === "Suspendue" ? ( // Check if suspended
                                 <>
                                   <FontAwesomeIcon
                                     icon={faCircle}
@@ -257,7 +258,7 @@ const handleEndDateChange = (e) => setEndDate(e.target.value);
                                   />
                                   Suspendue
                                 </>
-                              ) : person.etat === "active" ? ( // Check if active
+                              ) : person.etat === "Active" ? ( // Check if active
                                 <>
                                   <FontAwesomeIcon
                                     icon={faCircle}

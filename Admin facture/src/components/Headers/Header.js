@@ -63,24 +63,24 @@ const Header = () => {
         const currentDate = new Date();
 
         // Check and update the status if necessary
-        if (expirationDate < currentDate && person.etat !== "suspended") {
+        if (expirationDate < currentDate && person.etat !== "Suspendue") {
           axios.put(
             `${process.env.REACT_APP_API_URL}/superadmin/admins/${person._id}`,
-            { etat: "suspended" }
+            { etat: "Suspendue" }
           );
-          person.etat = "suspended"; // Update state directly here for dynamic update
+          person.etat = "Suspendue"; // Update state directly here for dynamic update
         }
         
         const isExpired = expirationDate < currentDate;
 
         // Count based on the person's status
-        if (person.etat === "active") {
+        if (person.etat === "Active") {
           active++;
-        } else if (person.etat === "suspended") {
+        } else if (person.etat === "Suspendue") {
           suspended++;
-        } else if (person.etat === "notActive") {
+        } else if (person.etat === "Désactivé") {
           notActive++;
-        } else if (person.etat === "expired") {
+        } else if (person.etat === "expiré") {
           expired++; // If the status is not in the predefined set, count it as expired
         }
 

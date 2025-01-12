@@ -70,7 +70,8 @@ const Login = () => {
         <Card className="bg-secondary shadow border-0">
           
           <CardBody className="px-lg-5 py-lg-5">
-            
+          <h1>Se connecter</h1>
+
             <Form role="form" onSubmit={handleSubmit}>
               {error && (
                 <div className="text-center text-danger mb-4">
@@ -131,13 +132,13 @@ const Login = () => {
         </Card>
         <Row className="mt-3">
 
-          <Col xs="6">
+          {/* <Col xs="6">
             <Link className="text-light" to="/password-reset/forgot-password">
               <small>mot de passe oublié?</small>
             </Link>
-          </Col>
+          </Col> */}
 
-          <Col className="text-right" xs="6">
+          <Col className="text-right" xs="4">
             <Link className="text-light" to="/auth/register">
               <small>Créer un compte</small>
             </Link>

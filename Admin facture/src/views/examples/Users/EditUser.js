@@ -91,12 +91,12 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
             disabled={isExpired && formData.etat === "active"} // Disable "active" if expired
           >
             <option value="">-- Sélectionnez un état --</option>
-            <option value="active" disabled={isExpired}>
+            <option value="Active" disabled={isExpired}>
               Active
             </option>
-            <option value="suspended">Suspendue</option>
-            <option value="notActive">Désactivé</option>
-            <option value="expired">éxpiré</option>
+            <option value="Suspendue">Suspendue</option>
+            <option value="Désactivé">Désactivé</option>
+            <option value="expiré">Expiré</option>
 
           </Input>
         </FormGroup>
