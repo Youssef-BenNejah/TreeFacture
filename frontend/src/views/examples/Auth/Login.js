@@ -15,7 +15,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
-
+import logo from "../../../assets/img/brand/logo.png"
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -72,7 +72,7 @@ const Login = () => {
         <Card className="bg-secondary shadow border-0">
           
           <CardBody className="px-lg-5 py-lg-5">
-            
+            <img src={logo} style={{ width: "150px", height: "150px",marginLeft : "90px" }}/>
             <Form role="form" onSubmit={handleSubmit}>
               {error && (
                 <div className="text-center text-danger mb-4">

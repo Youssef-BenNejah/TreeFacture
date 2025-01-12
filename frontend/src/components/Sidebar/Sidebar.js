@@ -51,7 +51,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
-
+import "./side.css"
 var ps;
 
 const Sidebar = (props) => {
@@ -117,12 +117,10 @@ const Sidebar = (props) => {
         </button>
         {/* Brand */}
         {logo ? (
-          <NavbarBrand className="pt-0" {...navbarBrandProps}>
-            <img
-              alt={logo.imgAlt}
-              className="navbar-brand-img"
-              src={logo.imgSrc}
-            />
+          <NavbarBrand className="pt-0 " {...navbarBrandProps}>
+            <div style={{ width: "10px", height: "50px" }}>
+              <img alt={logo.imgAlt} className="custom-navbar-brand" src={logo.imgSrc} />
+            </div>
           </NavbarBrand>
         ) : null}
         {/* User */}

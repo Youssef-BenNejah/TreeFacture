@@ -1,0 +1,5 @@
+.custom-navbar-brand {
+  height: 120px !important; /* Force height */
+  margin-left : 30px;
+
+}

@@ -15,6 +15,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import logo from "../../../assets/img/brand/logo.png"
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -70,7 +71,10 @@ const Register = () => {
         <Card className="bg-secondary shadow border-0">
           
           <CardBody className="px-lg-5 py-lg-5">
+          <img src={logo} style={{ width: "150px", height: "150px",marginLeft : "90px" }}/>
+
             <h1>Créer un compte</h1>
+
             <Form role="form" onSubmit={handleSubmit}>
               {error && (
                 <div className="text-center text-danger mb-4">

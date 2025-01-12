@@ -16,6 +16,7 @@ import {
   Col,
   CardHeader,
 } from "reactstrap";
+import logo from "../../../assets/img/brand/logo.png"
 
 const Register = () => {
   const navigate = useNavigate();
@@ -117,7 +118,8 @@ const Register = () => {
       <Card className="bg-secondary shadow border-0">
         
         <CardBody className="px-lg-5 py-lg-5">
-          
+        <img src={logo} style={{ width: "150px", height: "150px",marginLeft : "140px" }}/>
+
           <Form role="form" onSubmit={handleSubmit}>
             {error && (
               <div className="text-center text-danger mb-4">
