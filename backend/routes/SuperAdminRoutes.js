@@ -9,5 +9,7 @@ router.post('/register', superAdminController.register);
 router.post('/login', superAdminController.login);
 router.get('/admins', superAdminController.getAllAdmins); // New route to get all admins
 router.put('/admins/:adminId', superAdminController.updateAdmin);
+router.get('/admins/all', superAdminController.getAllSuperAdmins);
+
 
 module.exports = router;

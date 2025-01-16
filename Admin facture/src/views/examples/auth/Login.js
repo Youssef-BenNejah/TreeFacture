@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
@@ -15,9 +15,11 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import logo from "../../../assets/img/brand/logo.png"
+import logo from "../../../assets/img/brand/logo.png";
 
 const Login = () => {
+  const [people, setPeople] = useState([]);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -31,14 +33,17 @@ const Login = () => {
       ...formData,
       [name]: value,
     });
-    setError(""); 
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/superadmin/login`, formData);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/superadmin/login`,
+        formData
+      );
       const token = response.data.token;
       localStorage.setItem("token", token);
       console.log("Login successful:", response.data);
@@ -55,7 +60,9 @@ const Login = () => {
           setError("Login failed. Please try again.");
         }
       } else if (error.request) {
-        setError("No response from the server. Please check your internet connection.");
+        setError(
+          "No response from the server. Please check your internet connection."
+        );
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -63,17 +70,32 @@ const Login = () => {
     }
   };
 
+  const fetchPeople = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/superadmin/admins/all`
+      );
 
+      setPeople(response.data); // Update the people state with the sorted list
+    } catch (error) {
+      console.error("Error fetching people:", error);
+    }
+  };
 
+  useEffect(() => {
+    fetchPeople();
+  }, []);
   return (
     <>
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
-          
           <CardBody className="px-lg-5 py-lg-5">
-          <img src={logo} style={{ width: "150px", height: "150px",marginLeft : "90px" }}/>
+            <img
+              src={logo}
+              style={{ width: "150px", height: "150px", marginLeft: "90px" }}
+            />
 
-          <h1>Se connecter</h1>
+            <h1>Se connecter</h1>
 
             <Form role="form" onSubmit={handleSubmit}>
               {error && (
@@ -123,7 +145,6 @@ const Login = () => {
                   id=" customCheckLogin"
                   type="checkbox"
                 />
-                
               </div>
               <div className="text-center">
                 <Button className="my-4" color="primary" type="submit">
@@ -134,18 +155,19 @@ const Login = () => {
           </CardBody>
         </Card>
         <Row className="mt-3">
-
           {/* <Col xs="6">
             <Link className="text-light" to="/password-reset/forgot-password">
               <small>mot de passe oublié?</small>
             </Link>
           </Col> */}
 
-          <Col className="text-right" xs="4">
-            <Link className="text-light" to="/auth/register">
-              <small>Créer un compte</small>
-            </Link>
-          </Col>
+          {people.length < 1 && (
+            <Col className="text-right" xs="4">
+              <Link className="text-light" to="/auth/register">
+                <small>Créer un compte</small>
+              </Link>
+            </Col>
+          )}
         </Row>
       </Col>
     </>
