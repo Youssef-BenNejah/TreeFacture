@@ -28,17 +28,27 @@ import Report from "views/examples/Report/Report";
 
 
 const decodeToken = (token) => {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const payload = JSON.parse(atob(base64));
-  return payload;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Invalid token format');
+    }
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64));
+    return payload;
+  } catch (error) {
+    console.error('Error decoding token:', error.message);
+    return null;
+  }
 };
 
 const token = localStorage.getItem('token');
-const decodedToken = token ? decodeToken(token) : {};
-const currentUserId = decodedToken.AdminID;
+const decodedToken = token ? decodeToken(token) : null;
+const currentUserId = decodedToken?.AdminID;
 
-const isAuthenticated = !!currentUserId; 
+const isAuthenticated = !!currentUserId;
+
 const routes = [
   {
     path: "/index",

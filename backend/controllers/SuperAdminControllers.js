@@ -123,14 +123,8 @@ exports.getAllSuperAdmins = async (req, res) => {
   try {
     // Fetch all super admins from the database
     const superAdmins = await SuperAdmin.find();
-
-    // Check if any super admins exist
-    if (superAdmins.length === 0) {
-      return res.status(404).json({ message: 'No super admins found' });
-    }
-
-    // Return the list of super admins
     res.status(200).json(superAdmins);
+    
   } catch (error) {
     console.error('Error fetching super admins:', error);
     res.status(500).json({ message: 'Internal server error' });

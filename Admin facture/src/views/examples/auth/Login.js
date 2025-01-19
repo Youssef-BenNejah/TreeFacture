@@ -85,6 +85,8 @@ const Login = () => {
   useEffect(() => {
     fetchPeople();
   }, []);
+  
+console.log(people.length)
   return (
     <>
       <Col lg="5" md="7">
@@ -161,7 +163,7 @@ const Login = () => {
             </Link>
           </Col> */}
 
-          {people.length < 1 && (
+          { people.length ==0 && (
             <Col className="text-right" xs="4">
               <Link className="text-light" to="/auth/register">
                 <small>Créer un compte</small>

@@ -48,7 +48,11 @@ const Login = () => {
           setError("Admin not found or incorrect credentials.");
         } else if (error.response.status === 401) {
           setError("Incorrect email or password, or email not confirmed.");
-        } else if (error.response.status === 500) {
+          
+        } 
+        else if (error.response.status === 406 ) {
+          setError("Please contact admin for activation\nEmail: zouhasat@gmail.com\nPhone: 20517528"); }
+          else if (error.response.status === 500) {
           setError("Internal server error. Please try again later.");
         } else {
           setError("Login failed. Please try again.");
