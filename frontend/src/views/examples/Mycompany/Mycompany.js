@@ -175,7 +175,7 @@ const CompanyComponent = () => {
             toggleModal(); 
         } catch (error) {
             console.error('Error updating company:', error);
-            toast.error("Erreur lors de la mise à jour des informations de l'entreprise");
+            toast.error("Veuillez importer le logo de votre entreprise");
         }
     };
 

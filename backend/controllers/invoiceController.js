@@ -590,7 +590,7 @@ exports.generateInvoicePDF = async (req, res) => {
       }
       if (company.logo !== null) {
         // Adjust the width to make the logo smaller and position it at the top left corner
-        doc.image(company.logo, 20, 30, { width: 60 }); // Adjust the width to make it smaller
+        doc.image(company.logo, 20, 30, { width: 120 }); // Adjust the width to make it smaller
       } else {
         doc.text("Logo Placeholder", 50, 45, { width: 100 });
       }
