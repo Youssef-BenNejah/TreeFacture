@@ -99,8 +99,10 @@ exports.login = async (req, res) => {
     // If the user is disabled, return an error
  
 
+
     // Check if password matches
     const passwordMatch = await bcrypt.compare(password, userData.password);
+
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Incorrect email or password' });
     }

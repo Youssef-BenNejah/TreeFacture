@@ -1,6 +1,6 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const SuperAdmin = require('../models/coreModel/SuperAdmin'); // Import the SuperAdmin model
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const admin = require('../models/coreModel/admin');
 
 // Super Admin Register
@@ -39,31 +39,33 @@ exports.login = async (req, res) => {
   try {
     // Check if the super admin exists
     const superAdmin = await SuperAdmin.findOne({ email });
-    console.log("",password)
-    console.log("superpassword",superAdmin.password)
 
     if (!superAdmin) {
-      return res.status(400).json({ message: 'Super admin not found' });
+      return res.status(400).json({ message: "Super admin not found" });
     }
 
+    console.log("Stored password hash:", superAdmin.password);
+    console.log("Received plain-text password:", password);
     // Compare the provided password with the stored hash
-    const passwordMatch =  await  bcrypt.compare(password, superAdmin.password);
+    const passwordMatch = await bcrypt.compare(password, superAdmin.password);
+    console.log("Password match result:", passwordMatch);
+
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Incorrect email or password' });
+      return res.status(401).json({ message: "Incorrect email or password" });
     }
 
     // Generate a JWT token for the super admin
     const token = jwt.sign(
       { superAdminID: superAdmin.id, email: superAdmin.email },
       process.env.JWT_SECRET,
-      { expiresIn: '4h' } // Token expires in 4 hours
+      { expiresIn: "4h" } // Token expires in 4 hours
     );
 
     // Send the token to the client
     res.status(200).json({ token });
   } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

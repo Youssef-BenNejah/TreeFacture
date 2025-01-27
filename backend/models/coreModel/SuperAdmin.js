@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt');
 
 // Define the SuperAdmin schema
 const superAdminSchema = new Schema({
@@ -24,10 +24,19 @@ const superAdminSchema = new Schema({
 // Hash password before saving it to the database
 superAdminSchema.pre('save', async function (next) {
   const superAdmin = this;
-  if (superAdmin.isModified('password')) {
+
+  // Only hash if the password is new or has been modified and isn't already hashed
+  if (superAdmin.isModified('password') && !superAdmin.password.startsWith('$2b$')) {
+    console.log("Hashing password:", superAdmin.password);
     superAdmin.password = await bcrypt.hash(superAdmin.password, 10);
+    console.log("Password after hashing:", superAdmin.password);
+  } else {
+    console.log("Password is already hashed, skipping hashing.");
   }
+
   next();
 });
+
+
 
 module.exports = mongoose.model('SuperAdmin', superAdminSchema);

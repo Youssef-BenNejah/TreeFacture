@@ -86,7 +86,6 @@ const Login = () => {
     fetchPeople();
   }, []);
   
-console.log(people.length)
   return (
     <>
       <Col lg="5" md="7">
