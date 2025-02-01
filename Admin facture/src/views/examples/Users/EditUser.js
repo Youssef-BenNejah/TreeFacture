@@ -36,36 +36,37 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleSubmit = async () => {
-    if (!formData.etat) {
-      toast.error("Veuillez sélectionner un état.");
+    
+  
+    const selectedDate = new Date(formData.planExpirationDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Ensure time does not interfere
+    selectedDate.setHours(0, 0, 0, 0);
+  
+    console.log("Selected Expiration Date (Raw):", formData.planExpirationDate);
+    console.log("Selected Expiration Date (Parsed):", selectedDate);
+  
+    const daysUntilExpiration = Math.ceil((selectedDate - today) / (1000 * 60 * 60 * 24));
+  
+    if (daysUntilExpiration < 0) {
+      toast.error("La date d'expiration doit être future.");
       return;
     }
-
-    // Ensure "active" cannot be selected if the plan has expired
-    if (formData.etat === "active" && isExpired) {
-      toast.error("Le plan est expiré. Vous ne pouvez pas activer cet utilisateur.");
-      return;
+  
+    let updatedEtat = formData.etat;
+  
+    // Automatically activate if the user was disabled/expired and a new date is set
+    if ((formData.etat === "Désactivé" || formData.etat === "expiré") && daysUntilExpiration > 0) {
+      updatedEtat = "Active";
     }
-
-    let planExpiration = null; // Par défaut, aucune mise à jour de la date d'expiration
-    if (formData.planExpirationDate) {
-      const selectedDate = new Date(formData.planExpirationDate);
-      const today = new Date();
-      planExpiration = Math.ceil(
-        (selectedDate - today) / (1000 * 60 * 60 * 24)
-      ); // Calculer les jours
-      if (planExpiration < 0) {
-        toast.error("La date d'expiration doit être future.");
-        return;
-      }
-    }
-
+  
+    console.log("Days Until Expiration:", daysUntilExpiration);
+  
     try {
       await axios.put(
         `${process.env.REACT_APP_API_URL}/superadmin/admins/${person._id}`,
-        { etat: formData.etat, planExpiration }
+        { etat: updatedEtat, planExpiration: daysUntilExpiration }
       );
       toast.success("Utilisateur modifié avec succès !");
       refreshPeople();
@@ -75,6 +76,7 @@ const EditUser = ({ isOpen, toggle, person, refreshPeople }) => {
       toast.error("Erreur lors de la modification de l'utilisateur.");
     }
   };
+  
 
   return (
     <Modal isOpen={isOpen} toggle={toggle}>

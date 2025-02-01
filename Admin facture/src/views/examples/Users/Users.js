@@ -109,7 +109,6 @@ const filteredPeople = people.filter((person) => {
   person.surname?.toLowerCase().startsWith(query) ||
   person.email?.toLowerCase().startsWith(query) ||
   person.etat?.toLowerCase().startsWith(query);
-console.log(person)
 
   // Apply date filter
   const withinDateRange =
