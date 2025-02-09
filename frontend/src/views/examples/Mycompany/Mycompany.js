@@ -191,18 +191,21 @@ const CompanyComponent = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
                 toast.success('Le logo a été téléchargé avec succès');
                 fetchCompany();
                 setLogoFile(null); 
                 setSelectedLogoName(''); 
             } catch (error) {
                 console.error('Error uploading logo:', error);
+
                 toast.error('Error uploading logo');
             }
         } else {
             toast.warning('Aucun fichier de logo sélectionné');
         }
     };
+    console.log(currentUserId)
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];

@@ -111,14 +111,14 @@ const fileFilter = (req, file, cb) => {
   exports.uploadCompanyLogo = (req, res) => {
     const { createdBy } = req.params;
     const defaultData = {
-        name: "Nom",
-        matriculefisc:"matriculefisc",
-        address: "address",
-        state: "state",
-        country: "country",
-        email: "email",
-        phone: "phone",
-        website: "website",
+      name: " ",
+      matriculefisc:" ",
+      address: " ",
+      state: " ",
+      country: " ",
+      email: " ",
+      phone: " ",
+      website: " ",
         taxNumber: "91231255234",
         vatNumber: "91231255234",
         registrationNumber: "00001231421",

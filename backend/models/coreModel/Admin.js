@@ -52,12 +52,12 @@ const adminSchema = new Schema({
   etat: {
     type: String,
     enum: ['Active', 'Suspendue', 'Désactivé','expiré'], // Possible states
-    default: 'Active', // Default is active
+    default: 'Désactivé', // Default is active
   },
   planExpiration: { 
     type: Date, 
     required: true, 
-    default: () => new Date(Date.now() + 15 * 24 * 60 * 60 * 1000) // Par défaut, 15 jours à partir d'aujourd'hui
+    default: () => new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) // Par défaut, 15 jours à partir d'aujourd'hui
 }
 });
 adminSchema.pre('save', async function (next) {

@@ -24,7 +24,6 @@ const companySchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    match: [/\S+@\S+\.\S+/, 'is invalid'], // Basic email validation
   },
   phone: {
     type: String,

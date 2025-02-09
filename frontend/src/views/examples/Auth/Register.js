@@ -17,6 +17,7 @@ import {
   CardHeader,
 } from "reactstrap";
 import logo from "../../../assets/img/brand/logo.png"
+import { toast } from "react-toastify";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -96,6 +97,7 @@ const Register = () => {
 
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, formData);
+      toast.success('Your account hase been created ! \nPlease contact admin for activation\nEmail: zouhasat@gmail.com\nPhone: 20517528"');
       navigate('/auth/login');
       console.log("Registration successful:", response.data);
     } catch (error) {
