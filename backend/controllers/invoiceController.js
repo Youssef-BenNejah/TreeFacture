@@ -590,7 +590,7 @@ exports.generateInvoicePDF = async (req, res) => {
       }
       if (company.logo !== null) {
         // Adjust the width to make the logo smaller and position it at the top left corner
-        doc.image(company.logo, 20, 30, { width: 120 }); // Adjust the width to make it smaller
+        doc.image(company.logo, 20, 30, { width: 130 }); // Adjust the width to make it smaller
       } else {
         doc.text("Logo Placeholder", 50, 45, { width: 100 });
       }
@@ -607,7 +607,7 @@ exports.generateInvoicePDF = async (req, res) => {
       // If the company name exceeds the max width, move it to a new line
       if (doc.widthOfString(companyName) > maxWidth) {
         doc
-          .fontSize(20)
+          .fontSize(17)
           .text(companyName, xPosition, zPosition, {
             width: maxWidth,
             ellipsis: true,
@@ -615,7 +615,7 @@ exports.generateInvoicePDF = async (req, res) => {
           .moveDown();
         zPosition += 30; // Adjust spacing if needed
       } else {
-        doc.fontSize(20).text(companyName, xPosition, zPosition).moveDown();
+        doc.fontSize(17).text(companyName, xPosition, zPosition).moveDown();
       }
 
       // Adjust the address, state, and country positioning to ensure no overlap
@@ -808,7 +808,7 @@ exports.generateInvoicePDF = async (req, res) => {
         yPosition,
         {
           align: "left",
-          width: 800, // Ajoutez cette propriété pour limiter la largeur
+          width: 500, // Ajoutez cette propriété pour limiter la largeur
         }
       );
 
@@ -842,7 +842,7 @@ const generatePDF = (invoice, company) => {
     // If the company name exceeds the max width, move it to a new line
     if (doc.widthOfString(companyName) > maxWidth) {
       doc
-        .fontSize(20)
+        .fontSize(17)
         .text(companyName, xPosition, zPosition, {
           width: maxWidth,
           ellipsis: true,
@@ -850,7 +850,7 @@ const generatePDF = (invoice, company) => {
         .moveDown();
       zPosition += 30; // Adjust spacing if needed
     } else {
-      doc.fontSize(20).text(companyName, xPosition, zPosition).moveDown();
+      doc.fontSize(17).text(companyName, xPosition, zPosition).moveDown();
     }
 
     // Adjust the address, state, and country positioning to ensure no overlap
@@ -914,7 +914,7 @@ const generatePDF = (invoice, company) => {
     // Add the company logo
     if (company.logo !== null) {
       // Adjust the width to make the logo smaller and position it at the top left corner
-      doc.image(company.logo, 20, 30, { width: 120 }); // Adjust the width to make it smaller
+      doc.image(company.logo, 20, 30, { width: 130 }); // Adjust the width to make it smaller
     } else {
       doc.text("Logo Placeholder", 50, 45, { width: 100 });
     }
@@ -1036,7 +1036,7 @@ const generatePDF = (invoice, company) => {
       yPosition,
       {
         align: "left",
-        width: 800, // Ajoutez cette propriété pour limiter la largeur
+        width: 500, // Ajoutez cette propriété pour limiter la largeur
       }
     );
 
@@ -1192,7 +1192,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
 
     // Add the company logo
     if (company.logo !== null) {
-      doc.image(company.logo, 20, 30, { width: 120 }); // Adjust the width to make it smaller
+      doc.image(company.logo, 20, 30, { width: 130 }); // Adjust the width to make it smaller
     } else {
       doc.text("Logo Placeholder", 50, 45, { width: 100 });
     }
@@ -1205,7 +1205,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
 
     if (doc.widthOfString(companyName) > maxWidth) {
       doc
-        .fontSize(20)
+        .fontSize(17)
         .text(companyName, xPosition, zPosition, {
           width: maxWidth,
           ellipsis: true,
@@ -1213,7 +1213,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
         .moveDown();
       zPosition += 30; // Adjust spacing if needed
     } else {
-      doc.fontSize(20).text(companyName, xPosition, zPosition).moveDown();
+      doc.fontSize(17).text(companyName, xPosition, zPosition).moveDown();
     }
 
     // Add company information
@@ -1385,7 +1385,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
       yPosition,
       {
         align: "left",
-        width: 800, // Ajoutez cette propriété pour limiter la largeur
+        width: 500, // Ajoutez cette propriété pour limiter la largeur
       }
     );
 
