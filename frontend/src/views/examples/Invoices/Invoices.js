@@ -490,6 +490,7 @@ const Invoices = () => {
                                 </div>
                                 <div className="d-flex align-items-center">
                                     {/* Date Filter */}
+                                    Date Début
                                     <Input
                                         type="date"
                                         placeholder="Date Début"
@@ -497,6 +498,7 @@ const Invoices = () => {
                                         onChange={(e) => setStartDate(e.target.value)}
                                         className="mr-3"
                                     />
+                                    Date Fin
                                     <Input
                                         type="date"
                                         placeholder="Date Fin"
