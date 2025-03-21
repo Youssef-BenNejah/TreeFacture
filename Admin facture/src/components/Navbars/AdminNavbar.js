@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -15,6 +16,11 @@ import {
   Nav,
   Container,
   Media,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
 } from "reactstrap";
 
 
@@ -26,7 +32,6 @@ const decodeToken = (token) => {
   const payload = JSON.parse(atob(base64));
   return payload;
 };
-
 // Logout function
 const logout = () => {
   localStorage.removeItem("token");
@@ -46,7 +51,12 @@ const AdminNavbar = (props) => {
   const user = token ? decodeToken(token) : null;
   const [previewImage, setPreviewImage] = useState(null);
   const [avatarColor, setAvatarColor] = useState(getRandomColor());
+  const [modalOpen, setModalOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const decoToekn = token ? decodeToken(token) : {};
+const AdminEmail = decoToekn.email
 
+  const toggleModal = () => setModalOpen(!modalOpen);
 
 
   const handleLogout = (e) => {
@@ -70,6 +80,47 @@ const AdminNavbar = (props) => {
       }
     }
   }, []);
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    setPasswords({ ...passwords, [e.target.name]: e.target.value });
+  };
+
+  const handlePasswordChange = async () => {
+    const { newPassword, confirmPassword } = passwords;
+  
+    // Validation des champs
+    if (!newPassword || !confirmPassword) {
+      alert("Veuillez remplir tous les champs.");
+      return;
+    }
+  
+    if (newPassword !== confirmPassword) {
+      alert("Les nouveaux mots de passe ne correspondent pas.");
+      return;
+    }
+  
+    try {
+      // Envoi de la requête API avec uniquement email et newpassword
+      const response = await axios.post("http://localhost:5000/superadmin/reset-password", {
+        email: AdminEmail,  // Assure-toi que l'email est bien passé en prop
+        newpassword: newPassword, // Envoi uniquement du nouveau mot de passe
+      });
+  
+      // Message de succès
+      alert("Mot de passe réinitialisé avec succès !");
+      toggleModal(); // Fermer le modal après succès
+      setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (error) {
+      console.error("Erreur lors de la réinitialisation :", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Une erreur est survenue.");
+    }
+  };
+  
 
   return (
     <>
@@ -106,7 +157,10 @@ const AdminNavbar = (props) => {
                 </Media>
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-arrow" right>
-               
+              <DropdownItem href="#pablo" onClick={toggleModal}>
+                  <i className="ni ni-lock-circle-open" />
+                  <span>Changer mot de passe</span>
+                </DropdownItem>
                 <DropdownItem href="#pablo" onClick={handleLogout}>
                   <i className="ni ni-user-run" />
                   <span>Se déconnecter</span>
@@ -116,6 +170,52 @@ const AdminNavbar = (props) => {
           </Nav>
         </Container>
       </Navbar>
+
+      <Modal isOpen={modalOpen} toggle={toggleModal}>
+      <ModalHeader toggle={toggleModal}>Changer mot de passe</ModalHeader>
+      <ModalBody>
+        <Form>
+          <FormGroup>
+            <label>Mot de passe actuel</label>
+            <Input
+              type="password"
+              name="currentPassword"
+              value={passwords.currentPassword}
+              onChange={handleChange}
+              placeholder="Entrez votre mot de passe actuel"
+            />
+          </FormGroup>
+          <FormGroup>
+            <label>Nouveau mot de passe</label>
+            <Input
+              type="password"
+              name="newPassword"
+              value={passwords.newPassword}
+              onChange={handleChange}
+              placeholder="Entrez un nouveau mot de passe"
+            />
+          </FormGroup>
+          <FormGroup>
+            <label>Confirmer le nouveau mot de passe</label>
+            <Input
+              type="password"
+              name="confirmPassword"
+              value={passwords.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirmez votre nouveau mot de passe"
+            />
+          </FormGroup>
+        </Form>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="primary" onClick={handlePasswordChange}>
+          Mettre à jour
+        </Button>
+        <Button color="secondary" onClick={toggleModal}>
+          Annuler
+        </Button>
+      </ModalFooter>
+    </Modal>
     </>
   );
 };
