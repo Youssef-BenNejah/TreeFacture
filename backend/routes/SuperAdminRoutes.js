@@ -11,6 +11,6 @@ router.get('/admins', superAdminController.getAllAdmins); // New route to get al
 router.put('/admins/:adminId', superAdminController.updateAdmin);
 router.get('/admins/all', superAdminController.getAllSuperAdmins);
 
-router.post('/reset-password',  superAdminController.resetPassword);
+router.post('/reset-password',  superAdminController.changePassword);
 
 module.exports = router;

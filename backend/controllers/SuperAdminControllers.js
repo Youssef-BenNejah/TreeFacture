@@ -133,47 +133,9 @@ exports.getAllSuperAdmins = async (req, res) => {
   }
 };
 
-// Super Admin Change Password
+
+
 exports.changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-
-  try {
-    // Get the super admin's ID from the JWT token
-    const superAdminId = req.param.superAdminID;  // Assumes JWT token is passed and decoded with superAdminID
-
-    // Fetch the super admin from the database
-    const superAdmin = await SuperAdmin.findById(superAdminId);
-
-    if (!superAdmin) {
-      return res.status(404).json({ message: 'Super admin not found' });
-    }
-
-    // Check if the current password matches the stored one
-    const passwordMatch = await bcrypt.compare(currentPassword, superAdmin.password);
-
-    if (!passwordMatch) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
-    }
-
-    // Hash the new password
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update the password in the database
-    superAdmin.password = hashedNewPassword;
-
-    // Save the super admin with the new password
-    await superAdmin.save();
-
-    res.status(200).json({ message: 'Password updated successfully' });
-  } catch (error) {
-    console.error('Error changing password:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-
-
-exports.resetPassword = async (req, res) => {
   try {
       const { email, newpassword } = req.body;
 
