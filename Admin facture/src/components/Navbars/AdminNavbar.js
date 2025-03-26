@@ -106,7 +106,7 @@ const AdminEmail = decoToekn.email
   
     try {
       // Envoi de la requête API avec uniquement email et newpassword
-      const response = await axios.post("http://localhost:5000/superadmin/reset-password", {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/superadmin/reset-password`, {
         email: AdminEmail,  // Assure-toi que l'email est bien passé en prop
         newpassword: newPassword, // Envoi uniquement du nouveau mot de passe
       });
