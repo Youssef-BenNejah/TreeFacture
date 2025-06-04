@@ -632,7 +632,7 @@ exports.generateInvoicePDF = async (req, res) => {
       doc
         .fontSize(10)
         .fillColor("black")
-        .text(`Date : ${invoice.date.toLocaleDateString()}`, 50, 200)
+        .text(`Date : ${invoice.date.toLocaleDateString('en-GB')}`, 50, 200)
         .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
         .moveDown();
 
@@ -867,7 +867,7 @@ const generatePDF = (invoice, company) => {
     doc
       .fontSize(10)
       .fillColor("black")
-      .text(`Date : ${invoice.date.toLocaleDateString()}`, 50, 200)
+      .text(`Date : ${invoice.date.toLocaleDateString('en-GB')}`, 50, 200)
       .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
       .moveDown();
 
@@ -1230,7 +1230,7 @@ exports.generateInvoicePDFandSendEmail = async (req, res) => {
     doc
       .fontSize(10)
       .fillColor("black")
-      .text(`Date : ${invoice.date.toLocaleDateString()}`, 50, 200)
+      .text(`Date : ${invoice.date.toLocaleDateString('en-GB')}`, 50, 200)
       .text(`Numéro : # ${invoice.number}/${invoice.year}`, 50, 230)
       .moveDown();
 
